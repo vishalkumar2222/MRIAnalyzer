@@ -6,10 +6,8 @@ ImportDialog::ImportDialog(QWidget *parent) :
     ui(new Ui::ImportDialog)
 {
     ui->setupUi(this);
-    ComboBoxDelegate *delegate = new ComboBoxDelegate();
-    ui->tableView->setItemDelegate(delegate);
-    explorer_ = new FileExplorer();
-    ui->tableView->setModel(explorer_);
+    model_ = new QStringListModel();
+    ui->listView_files->setModel(model_);
 }
 
 ImportDialog::~ImportDialog()
@@ -19,5 +17,33 @@ ImportDialog::~ImportDialog()
 
 void ImportDialog::on_pushButton_add_clicked()
 {
-    explorer_->AddFileName("/home/ess/Downloads/pig21_imaging.vtk");
+
+    QStringList files = QFileDialog::getOpenFileNames(this,tr("Add"),tr("Files(*.vtk *.nii"));
+
+    for(const auto& file : files)
+    {
+        files_.append(file);
+    }
+    model_->setStringList(files_);
+}
+
+void ImportDialog::on_pushButton_remove_clicked()
+{
+    if(ui->listView_files->currentIndex().isValid())
+    {
+        int row = ui->listView_files->currentIndex().row();
+        files_.removeAt(row);
+        model_->setStringList(files_);
+    }
+}
+
+void ImportDialog::on_listView_files_clicked(const QModelIndex &index)
+{
+    if(index.isValid())
+        ui->pushButton_remove->setEnabled(true);
+}
+
+QStringList ImportDialog::GetFiles() const
+{
+    return files_;
 }

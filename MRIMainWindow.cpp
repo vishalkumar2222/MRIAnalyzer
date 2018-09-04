@@ -24,41 +24,35 @@ MRIMainWindow::~MRIMainWindow()
     delete ui;
 }
 
-void MRIMainWindow::OnImportMeshFileActionTriggered()
+void MRIMainWindow::on_action_Import_Data_triggered()
 {
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Open"), tr("/"), tr("Mesh File(*.vtk)"));
-    if(file_name.isEmpty())
-        return;
+    ImportDialog dialog;
 
-    // Get all data from the file
-    vtkSmartPointer<vtkGenericDataObjectReader> reader =
-            vtkSmartPointer<vtkGenericDataObjectReader>::New();
-    reader->SetFileName(file_name.toStdString().c_str());
-    reader->Update();
-
-    // All of the standard data types can be checked and obtained like this:
-    if(reader->IsFilePolyData())
+    if(dialog.exec() == QDialog::Accepted)
     {
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(reader->GetOutputPort());
+        QStringList files = dialog.GetFiles();
 
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-
-        actor->SetMapper(mapper);
-
-        vtk_renderer_->GetRenderer()->AddActor(actor);
-        vtk_renderer_->UpdateRenderer();
+        for(auto file : files)
+        {
+            QFileInfo info(file);
+            if(info.suffix() == "vtk")
+            {
+                ReadMeshData(file);
+            }
+            else if(info.suffix() == "nii")
+            {
+                ReadImageData(file);
+            }
+        }
     }
 }
 
-void MRIMainWindow::OnImportImageStackFileActionTriggered()
+void MRIMainWindow::ReadImageData(const QString &filename)
 {
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Open"), tr("/"), tr("Image File(*.nii)"));
-
     vtkSmartPointer<vtkNIFTIImageReader> reader =
             vtkSmartPointer<vtkNIFTIImageReader>::New();
 
-    reader->SetFileName(file_name.toStdString().c_str());
+    reader->SetFileName(filename.toStdString().c_str());
     reader->Update();
 
     if (reader->GetErrorCode() != vtkErrorCode::NoError)
@@ -66,21 +60,6 @@ void MRIMainWindow::OnImportImageStackFileActionTriggered()
         qDebug()<<"Error in reading";
         return;
     }
-
-
-
-
-
-
-    //    vtkSmartPointer<vtkRenderWindowInteractor> iren =
-    //            vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    //    vtkSmartPointer<vtkInteractorStyleImage> style =
-    //            vtkSmartPointer<vtkInteractorStyleImage>::New();
-    //    style->SetInteractionModeToImage3D();
-    //    vtkSmartPointer<vtkRenderWindow> renWin =
-    //            vtkSmartPointer<vtkRenderWindow>::New();
-    //    iren->SetRenderWindow(renWin);
-    //    iren->SetInteractorStyle(style);
 
     vtkSmartPointer<vtkMatrix4x4> matrix =
             vtkSmartPointer<vtkMatrix4x4>::New();
@@ -147,62 +126,27 @@ void MRIMainWindow::OnImportImageStackFileActionTriggered()
     xy_slice_viewer_->UpdateRenderer();
     yz_slice_viewer_->UpdateRenderer();
     xz_slice_viewer_->UpdateRenderer();
-
-
-
-
-
-
-    // vtkSmartPointer<vtkImageDataToUniformGrid> image_to_grid = vtkSmartPointer<vtkImageDataToUniformGrid>::New();
-    // image_to_grid->SetInputConnection(reader->GetOutputPort());
-    // image_to_grid->Update();
-
-
-    // vtkImageData *image_data = reader->GetOutput();
-
-    //  vtkSmartPointer<vtkUniformGrid> uniform_grid = vtkSmartPointer<vtkUniformGrid>::New();
-
-
-    // Convert the image to a polydata
-    //    vtkSmartPointer<vtkImageDataGeometryFilter> imageDataGeometryFilter =
-    //      vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-    //    imageDataGeometryFilter->SetInputConnection(reader->GetOutputPort());
-    //    imageDataGeometryFilter->Update();
-
-    //    vtkSmartPointer<vtkPolyDataMapper> mapper =
-    //      vtkSmartPointer<vtkPolyDataMapper>::New();
-    //    mapper->SetInputConnection(imageDataGeometryFilter->GetOutputPort());
-
-    //    vtkSmartPointer<vtkActor> actor =
-    //      vtkSmartPointer<vtkActor>::New();
-    //    actor->SetMapper(mapper);
-    //    actor->GetProperty()->SetOpacity(0.5);
-
-    //    uni
-    //    uniform_grid->CopyAndCastFrom(image_data, image_data->);
-
-
-    //    vtkSmartPointer<vtkImageViewer2> viewer = vtkSmartPointer<vtkImageViewer2>::New();
-
-    //    viewer->SetInputConnection(reader->GetOutputPort());
-
-    //    viewer->Render();
-
-
-    //    vtkSmartPointer<vtkImageActor> actor =vtkSmartPointer<vtkImageActor>::New();
-    //    actor->SetInputData(reader->GetOutput());
-
-    //    renderer_->AddActor(actor);
-    //    renderer_->SetBackground(0.5,0.5,0.5);
-    //    renderer_->ResetCamera();
-    //    renderer_->Render();
-
-
 }
 
-void MRIMainWindow::on_action_Import_Data_triggered()
+void MRIMainWindow::ReadMeshData(const QString &filename)
 {
-    ImportDialog dialog;
+    // Get all data from the file
+    vtkSmartPointer<vtkGenericDataObjectReader> reader =
+            vtkSmartPointer<vtkGenericDataObjectReader>::New();
+    reader->SetFileName(filename.toStdString().c_str());
+    reader->Update();
 
-    dialog.exec();
+    // All of the standard data types can be checked and obtained like this:
+    if(reader->IsFilePolyData())
+    {
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(reader->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+
+        actor->SetMapper(mapper);
+
+        vtk_renderer_->GetRenderer()->AddActor(actor);
+        vtk_renderer_->UpdateRenderer();
+    }
 }

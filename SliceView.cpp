@@ -46,4 +46,5 @@ void SliceView::UpdateRenderer()
     renderer_->ResetCamera();
     renderer_->Render();
     widget_->update();
+    this->update();
 }

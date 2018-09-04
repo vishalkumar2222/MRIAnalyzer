@@ -17,9 +17,7 @@ SOURCES += main.cpp \
     MRIMainWindow.cpp \
     SliceView.cpp \
     VTKRenderer.cpp \
-    ImportDialog.cpp \
-    FileExplorer.cpp \
-    ComboBoxDelegate.cpp
+    ImportDialog.cpp
 
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkalglib-8.1
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkChartsCore-8.1
@@ -155,6 +153,4 @@ HEADERS += \
     MRIMainWindow.h \
     SliceView.h \
     VTKRenderer.h \
-    ImportDialog.h \
-    FileExplorer.h \
-    ComboBoxDelegate.h
+    ImportDialog.h

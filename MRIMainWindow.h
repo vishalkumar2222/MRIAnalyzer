@@ -57,13 +57,12 @@ public:
 
 private slots:
 
-    void OnImportMeshFileActionTriggered();
-
-    void OnImportImageStackFileActionTriggered();
-
     void on_action_Import_Data_triggered();
 
 private:
+
+    void ReadImageData(const QString& filename);
+    void ReadMeshData(const QString& filename);
     Ui::MRIMainWindow *ui;
     VTKRenderer *vtk_renderer_;
     SliceView *xy_slice_viewer_;
