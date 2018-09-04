@@ -7,18 +7,16 @@ MRIMainWindow::MRIMainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    renderer_ = vtkSmartPointer<vtkRenderer>::New();
-    render_window_ = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    render_window_->AddRenderer(renderer_.Get());
-    widget_ = new QVTKOpenGLWidget();
-    widget_->SetRenderWindow(render_window_.Get());
-    render_window_->SetMultiSamples(0);
-    renderer_->SetBackground(0.5,0.5,0.5);
-    this->setCentralWidget(widget_);
-    QObject::connect(ui->action_Image_Stack_nrrd,&QAction::triggered, this, &MRIMainWindow::OnImportImageStackFileActionTriggered);
-    QObject::connect(ui->action_Mesh_File_vtk,&QAction::triggered, this, &MRIMainWindow::OnImportMeshFileActionTriggered);
+    vtk_renderer_ = new VTKRenderer(this);
+    xy_slice_viewer_ = new SliceView("XY", this);
+    yz_slice_viewer_ = new SliceView("YZ", this);
+    xz_slice_viewer_ = new SliceView("ZX",this);
 
-    ui->toolBar->addActions(QList<QAction*>()<<ui->actionNew <<ui->action_Open<<ui->action_Save);
+    ui->gridLayout->addWidget(xy_slice_viewer_, 0, 0);
+    ui->gridLayout->addWidget(vtk_renderer_, 0, 1);
+    ui->gridLayout->addWidget(yz_slice_viewer_, 1, 0);
+    ui->gridLayout->addWidget(xz_slice_viewer_, 1, 1);
+
 }
 
 MRIMainWindow::~MRIMainWindow()
@@ -48,11 +46,9 @@ void MRIMainWindow::OnImportMeshFileActionTriggered()
 
         actor->SetMapper(mapper);
 
-        renderer_->AddActor(actor);
-        renderer_->ResetCamera();
-        renderer_->Render();
+        vtk_renderer_->GetRenderer()->AddActor(actor);
+        vtk_renderer_->UpdateRenderer();
     }
-
 }
 
 void MRIMainWindow::OnImportImageStackFileActionTriggered()
@@ -60,52 +56,153 @@ void MRIMainWindow::OnImportImageStackFileActionTriggered()
     QString file_name = QFileDialog::getOpenFileName(this, tr("Open"), tr("/"), tr("Image File(*.nii)"));
 
     vtkSmartPointer<vtkNIFTIImageReader> reader =
-          vtkSmartPointer<vtkNIFTIImageReader>::New();
+            vtkSmartPointer<vtkNIFTIImageReader>::New();
 
     reader->SetFileName(file_name.toStdString().c_str());
     reader->Update();
 
-   // vtkSmartPointer<vtkImageDataToUniformGrid> image_to_grid = vtkSmartPointer<vtkImageDataToUniformGrid>::New();
-   // image_to_grid->SetInputConnection(reader->GetOutputPort());
-   // image_to_grid->Update();
+    if (reader->GetErrorCode() != vtkErrorCode::NoError)
+    {
+        qDebug()<<"Error in reading";
+        return;
+    }
 
 
-   // vtkImageData *image_data = reader->GetOutput();
 
-  //  vtkSmartPointer<vtkUniformGrid> uniform_grid = vtkSmartPointer<vtkUniformGrid>::New();
+
+
+
+    //    vtkSmartPointer<vtkRenderWindowInteractor> iren =
+    //            vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    //    vtkSmartPointer<vtkInteractorStyleImage> style =
+    //            vtkSmartPointer<vtkInteractorStyleImage>::New();
+    //    style->SetInteractionModeToImage3D();
+    //    vtkSmartPointer<vtkRenderWindow> renWin =
+    //            vtkSmartPointer<vtkRenderWindow>::New();
+    //    iren->SetRenderWindow(renWin);
+    //    iren->SetInteractorStyle(style);
+
+    vtkSmartPointer<vtkMatrix4x4> matrix =
+            vtkSmartPointer<vtkMatrix4x4>::New();
+    if (reader->GetQFormMatrix())
+    {
+        matrix->DeepCopy(reader->GetQFormMatrix());
+        matrix->Invert();
+    }
+    else if (reader->GetSFormMatrix())
+    {
+        matrix->DeepCopy(reader->GetSFormMatrix());
+        matrix->Invert();
+    }
+
+    vtkSmartPointer<vtkImageReslice> reslice =
+            vtkSmartPointer<vtkImageReslice>::New();
+    reslice->SetInputConnection(reader->GetOutputPort());
+    reslice->SetResliceAxes(matrix);
+    reslice->SetInterpolationModeToLinear();
+    reslice->Update();
+
+    double range[2];
+    int extent[6];
+    reslice->GetOutput()->GetScalarRange(range);
+    reslice->GetOutput()->GetExtent(extent);
+
+    // check if image is 2D
+    bool imageIs3D = (extent[5] > extent[4]);
+
+    for (int i = 2*(imageIs3D == 0); i < 3; i++)
+    {
+        vtkSmartPointer<vtkImageSliceMapper> imageMapper =
+                vtkSmartPointer<vtkImageSliceMapper>::New();
+        if (i < 3)
+        {
+            imageMapper->SetInputConnection(reslice->GetOutputPort());
+        }
+        imageMapper->SetOrientation(i % 3);
+        imageMapper->SliceAtFocalPointOn();
+
+        vtkSmartPointer<vtkImageSlice> image =
+                vtkSmartPointer<vtkImageSlice>::New();
+        image->SetMapper(imageMapper);
+
+        image->GetProperty()->SetColorWindow(range[1] - range[0]);
+        image->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
+        image->GetProperty()->SetInterpolationTypeToNearest();
+
+
+        switch(i)
+        {
+        case 0:
+            xy_slice_viewer_->GetRenderer()->AddViewProp(image);
+            break;
+        case 1:
+            yz_slice_viewer_->GetRenderer()->AddViewProp(image);
+            break;
+        case 2:
+            xz_slice_viewer_->GetRenderer()->AddViewProp(image);
+            break;
+        }
+    }
+
+    xy_slice_viewer_->UpdateRenderer();
+    yz_slice_viewer_->UpdateRenderer();
+    xz_slice_viewer_->UpdateRenderer();
+
+
+
+
+
+
+    // vtkSmartPointer<vtkImageDataToUniformGrid> image_to_grid = vtkSmartPointer<vtkImageDataToUniformGrid>::New();
+    // image_to_grid->SetInputConnection(reader->GetOutputPort());
+    // image_to_grid->Update();
+
+
+    // vtkImageData *image_data = reader->GetOutput();
+
+    //  vtkSmartPointer<vtkUniformGrid> uniform_grid = vtkSmartPointer<vtkUniformGrid>::New();
 
 
     // Convert the image to a polydata
-    vtkSmartPointer<vtkImageDataGeometryFilter> imageDataGeometryFilter =
-      vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-    imageDataGeometryFilter->SetInputConnection(reader->GetOutputPort());
-    imageDataGeometryFilter->Update();
+    //    vtkSmartPointer<vtkImageDataGeometryFilter> imageDataGeometryFilter =
+    //      vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+    //    imageDataGeometryFilter->SetInputConnection(reader->GetOutputPort());
+    //    imageDataGeometryFilter->Update();
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper =
-      vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(imageDataGeometryFilter->GetOutputPort());
+    //    vtkSmartPointer<vtkPolyDataMapper> mapper =
+    //      vtkSmartPointer<vtkPolyDataMapper>::New();
+    //    mapper->SetInputConnection(imageDataGeometryFilter->GetOutputPort());
 
-    vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-    actor->GetProperty()->SetOpacity(0.5);
+    //    vtkSmartPointer<vtkActor> actor =
+    //      vtkSmartPointer<vtkActor>::New();
+    //    actor->SetMapper(mapper);
+    //    actor->GetProperty()->SetOpacity(0.5);
 
-//    uni
-//    uniform_grid->CopyAndCastFrom(image_data, image_data->);
-
-
-//    vtkSmartPointer<vtkImageViewer2> viewer = vtkSmartPointer<vtkImageViewer2>::New();
-
-//    viewer->SetInputConnection(reader->GetOutputPort());
-
-//    viewer->Render();
+    //    uni
+    //    uniform_grid->CopyAndCastFrom(image_data, image_data->);
 
 
-//    vtkSmartPointer<vtkImageActor> actor =vtkSmartPointer<vtkImageActor>::New();
-//    actor->SetInputData(reader->GetOutput());
+    //    vtkSmartPointer<vtkImageViewer2> viewer = vtkSmartPointer<vtkImageViewer2>::New();
 
-    renderer_->AddActor(actor);
-    renderer_->SetBackground(0.5,0.5,0.5);
-    renderer_->ResetCamera();
-    renderer_->Render();
+    //    viewer->SetInputConnection(reader->GetOutputPort());
+
+    //    viewer->Render();
+
+
+    //    vtkSmartPointer<vtkImageActor> actor =vtkSmartPointer<vtkImageActor>::New();
+    //    actor->SetInputData(reader->GetOutput());
+
+    //    renderer_->AddActor(actor);
+    //    renderer_->SetBackground(0.5,0.5,0.5);
+    //    renderer_->ResetCamera();
+    //    renderer_->Render();
+
+
+}
+
+void MRIMainWindow::on_action_Import_Data_triggered()
+{
+    ImportDialog dialog;
+
+    dialog.exec();
 }

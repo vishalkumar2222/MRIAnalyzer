@@ -31,7 +31,17 @@
 #include <QDebug>
 #include <vtkImageDataGeometryFilter.h>
 #include <vtkProperty.h>
+#include <vtkImageReslice.h>
+#include <vtkImageSlice.h>
+#include <vtkCamera.h>
+#include <vtkErrorCode.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkMatrix4x4.h>
 #include <vtkImageViewer2.h>
+#include <vtkImageProperty.h>
+#include "SliceView.h"
+#include "VTKRenderer.h"
+#include "ImportDialog.h"
 
 namespace Ui {
 class MRIMainWindow;
@@ -51,11 +61,14 @@ private slots:
 
     void OnImportImageStackFileActionTriggered();
 
+    void on_action_Import_Data_triggered();
+
 private:
     Ui::MRIMainWindow *ui;
-    QVTKOpenGLWidget *widget_;
-    vtkSmartPointer<vtkRenderer> renderer_;
-    vtkSmartPointer<vtkGenericOpenGLRenderWindow> render_window_;
+    VTKRenderer *vtk_renderer_;
+    SliceView *xy_slice_viewer_;
+    SliceView *yz_slice_viewer_;
+    SliceView *xz_slice_viewer_;
 };
 
 #endif // MRIMAINWINDOW_H

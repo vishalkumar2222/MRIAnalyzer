@@ -14,7 +14,12 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    MRIMainWindow.cpp
+    MRIMainWindow.cpp \
+    SliceView.cpp \
+    VTKRenderer.cpp \
+    ImportDialog.cpp \
+    FileExplorer.cpp \
+    ComboBoxDelegate.cpp
 
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkalglib-8.1
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkChartsCore-8.1
@@ -140,8 +145,16 @@ DEPENDPATH += $$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/
 
 
 
-FORMS += MRIMainWindow.ui
+FORMS += MRIMainWindow.ui \
+    SliceView.ui \
+    VTKRenderer.ui \
+    ImportDialog.ui
 
 
 HEADERS += \
-    MRIMainWindow.h
+    MRIMainWindow.h \
+    SliceView.h \
+    VTKRenderer.h \
+    ImportDialog.h \
+    FileExplorer.h \
+    ComboBoxDelegate.h
