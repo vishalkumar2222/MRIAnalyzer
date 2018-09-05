@@ -153,4 +153,5 @@ HEADERS += \
     MRIMainWindow.h \
     SliceView.h \
     VTKRenderer.h \
-    ImportDialog.h
+    ImportDialog.h \
+    SliceInteratorStyle.h

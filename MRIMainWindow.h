@@ -3,11 +3,9 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
-#include <vtkNrrdReader.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageMapper.h>
 #include <vtkActor.h>
-#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkImageActor.h>
 #include <vtkNIFTIImageReader.h>
@@ -23,8 +21,6 @@
 #include <vtkGenericDataObjectReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkImageSlice.h>
-#include <vtkCubeSource.h>
-#include <QVTKOpenGLWidget.h>
 #include <vtkUniformGrid.h>
 #include <vtkImageDataToUniformGrid.h>
 #include <vtkUniformGridAMR.h>
@@ -68,6 +64,7 @@ private:
     SliceView *xy_slice_viewer_;
     SliceView *yz_slice_viewer_;
     SliceView *xz_slice_viewer_;
+
 };
 
 #endif // MRIMAINWINDOW_H

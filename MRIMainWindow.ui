@@ -43,7 +43,15 @@
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="action_Mesh_View"/>
+    <addaction name="action_Image_Stack"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -68,6 +76,28 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="action_Mesh_View">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Mesh View</string>
+   </property>
+  </action>
+  <action name="action_Image_Stack">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Image Stack</string>
    </property>
   </action>
  </widget>

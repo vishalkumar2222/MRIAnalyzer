@@ -8,6 +8,8 @@ ImportDialog::ImportDialog(QWidget *parent) :
     ui->setupUi(this);
     model_ = new QStringListModel();
     ui->listView_files->setModel(model_);
+    files_<<"/home/ess/Downloads/pig21_bssfp_cropped.nii" << "/home/ess/Downloads/pig21_imaging.vtk";
+    model_->setStringList(files_);
 }
 
 ImportDialog::~ImportDialog()

@@ -6,6 +6,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkGenericOpenGLRenderWindow.h>
+#include "SliceInteratorStyle.h"
+
+class SliceInteratorStyle;
 
 namespace Ui {
 class SliceView;
@@ -26,11 +29,16 @@ public:
     vtkSmartPointer<vtkRenderer> GetRenderer() const;
 
     void UpdateRenderer();
+
+    vtkSmartPointer<vtkImageViewer2> GetImageViewer() const;
+
 private:
     Ui::SliceView *ui;
     QVTKOpenGLWidget *widget_;
     vtkSmartPointer<vtkRenderer> renderer_;
+    SliceInteratorStyle *image_interactor_style_;
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> render_window_;
+    vtkSmartPointer<vtkImageViewer2> image_viewer_;
 };
 
 #endif // SLICEVIEW_H
