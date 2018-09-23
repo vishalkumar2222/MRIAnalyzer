@@ -32,12 +32,37 @@
 #include <vtkCamera.h>
 #include <vtkErrorCode.h>
 #include <vtkInteractorStyleImage.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageViewer2.h>
+#include <vtkPolyDataConnectivityFilter.h>
 #include <vtkImageProperty.h>
-#include "SliceView.h"
+#include <vtkStructuredPoints.h>
+#include <vtkStructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkMolecule.h>
 #include "VTKRenderer.h"
 #include "ImportDialog.h"
+#include "AnimationWidget.h"
+#include "ParticleMapper.h"
+#include "ProjectTreeModel.h"
+#include <QTimer>
+
+
+#include <vtkPriorityQueue.h>
+#include <vtkScalarBarActor.h>
+#include <vtkSampleFunction.h>
+#include <vtkOpenGLGPUVolumeRayCastMapper.h>
+#include <vtkImageShiftScale.h>
+#include <vtkLookupTable.h>
+#include <vtkDoubleArray.h>
+#include <vtkTransformFilter.h>
+#include <vtkTransform.h>
+#include <vtkSmartVolumeMapper.h>
+#include <QVector3D>
+#include <QMultiHash>
+#include <algorithm>
+#include <vtkOggTheoraWriter.h>
 
 namespace Ui {
 class MRIMainWindow;
@@ -55,15 +80,49 @@ private slots:
 
     void on_action_Import_Data_triggered();
 
+    void PlayAnimation();
+
+    void on_action_Slice_View_triggered();
+
+    void on_action_3D_View_triggered();
+
 private:
 
     void ReadImageData(const QString& filename);
     void ReadMeshData(const QString& filename);
+
+    void SplitMeshFile(const vtkSmartPointer<vtkPolyData> &source, vtkSmartPointer<vtkPolyData> &mesh);
+
     Ui::MRIMainWindow *ui;
     VTKRenderer *vtk_renderer_;
-    SliceView *xy_slice_viewer_;
-    SliceView *yz_slice_viewer_;
-    SliceView *xz_slice_viewer_;
+    QTimer *timer_;
+    AnimationWidget *animate_widget_;
+
+    ProjectTreeModel *project_model_;
+
+    TreeItem *root_item_;
+    TreeItem *image_Stack_item_;
+    TreeItem *mesh_item_;
+
+    int red;
+    int green;
+    int blue;
+
+    QMap<QString, vtkProp3D*> actor_map_;
+
+    QMultiHash<float, QVector3D> hash_;
+
+    QList<float> activation_time_;
+
+    double center_[3];
+
+    bool center_set_;
+
+    vtkIdType count_;
+
+    vtkSmartPointer<vtkActor> animation_actor_;
+
+    vtkSmartPointer<vtkPolyDataMapper> animation_mapper_;
 
 };
 

@@ -22,7 +22,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QGridLayout" name="gridLayout"/>
+     <layout class="QVBoxLayout" name="verticalLayout_main"/>
     </item>
    </layout>
   </widget>
@@ -47,8 +47,8 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_Mesh_View"/>
-    <addaction name="action_Image_Stack"/>
+    <addaction name="action_Slice_View"/>
+    <addaction name="action_3D_View"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_View"/>
@@ -65,6 +65,22 @@
     <bool>false</bool>
    </attribute>
   </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QTreeView" name="treeView">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="action_Exit">
    <property name="text">
     <string>&amp;Exit</string>
@@ -78,18 +94,12 @@
     <string>Ctrl+I</string>
    </property>
   </action>
-  <action name="action_Mesh_View">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
+  <action name="action_Slice_View">
    <property name="text">
-    <string>&amp;Mesh View</string>
+    <string>&amp;Slice View</string>
    </property>
   </action>
-  <action name="action_Image_Stack">
+  <action name="action_3D_View">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -97,7 +107,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Image Stack</string>
+    <string>&amp;3D View</string>
    </property>
   </action>
  </widget>

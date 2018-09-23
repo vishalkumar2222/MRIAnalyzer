@@ -17,7 +17,11 @@ SOURCES += main.cpp \
     MRIMainWindow.cpp \
     SliceView.cpp \
     VTKRenderer.cpp \
-    ImportDialog.cpp
+    ImportDialog.cpp \
+    AnimationWidget.cpp \
+    ParticleMapper.cpp \
+    ProjectTreeModel.cpp \
+    TreeItem.cpp
 
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkalglib-8.1
  LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkChartsCore-8.1
@@ -146,7 +150,8 @@ DEPENDPATH += $$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/
 FORMS += MRIMainWindow.ui \
     SliceView.ui \
     VTKRenderer.ui \
-    ImportDialog.ui
+    ImportDialog.ui \
+    AnimationWidget.ui
 
 
 HEADERS += \
@@ -154,4 +159,11 @@ HEADERS += \
     SliceView.h \
     VTKRenderer.h \
     ImportDialog.h \
-    SliceInteratorStyle.h
+    SliceInteratorStyle.h \
+    AnimationWidget.h \
+    ParticleMapper.h \
+    TreeItem.h \
+    ProjectTreeModel.h
+
+RESOURCES += \
+    images.qrc
