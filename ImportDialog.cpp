@@ -9,7 +9,7 @@ ImportDialog::ImportDialog(QWidget *parent) :
     model_ = new QStringListModel();
     ui->listView_files->setModel(model_);
     //files_<<"/home/ess/Downloads/pig21_bssfp_cropped.nii" << "/home/ess/Downloads/VT15_actTimes.vtk" <<"/home/ess/Downloads/pig21_imaging.vtk";
-    files_<<"/home/ess/Downloads/pig21_bssfp_cropped.nii" << "/home/ess/Downloads/VT15_actTimes.vtk";
+    files_<<"/home/ess/Downloads/pig21_bssfp_cropped.nii" << "/home/ess/Downloads/VT15_actTimes.vtk"<<"/home/ess/Downloads/pig21_trans.vtk";
     model_->setStringList(files_);
 }
 

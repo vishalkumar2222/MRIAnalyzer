@@ -6,11 +6,9 @@ AnimationWidget::AnimationWidget(QWidget *parent) :
     ui(new Ui::AnimationWidget)
 {
     ui->setupUi(this);
-
     connect(ui->pushButton_play_pause,SIGNAL(clicked(bool)),this,SIGNAL(PlayButtonClicked()));
     connect(ui->pushButton_record,SIGNAL(clicked(bool)),this,SIGNAL(RecordButtonClicked()));
     connect(ui->pushButton_stop,SIGNAL(clicked(bool)),this,SIGNAL(StopButtonClicked()));
-
 }
 
 AnimationWidget::~AnimationWidget()

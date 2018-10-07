@@ -6,6 +6,8 @@
 // headers needed for this example
 #include <vtkImageViewer2.h>
 #include <vtkInteractorStyleImage.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
 
 // Define own interaction style
 class SliceInteratorStyle : public vtkInteractorStyleImage
@@ -31,6 +33,7 @@ protected:
       if(_Slice < _MaxSlice) {
          _Slice += 1;
          _ImageViewer->SetSlice(_Slice);
+         _ImageViewer->GetRenderer()->ResetCamera();
          _ImageViewer->Render();
       }
    }

@@ -8,6 +8,7 @@
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkInteractorStyleImage.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkCamera.h>
 
 namespace Ui {
