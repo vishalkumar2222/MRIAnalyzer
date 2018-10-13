@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QProcess>
+#include <QTimer>
 #include <QDebug>
 namespace Ui {
 class AnimationSaveDialog;
@@ -27,6 +28,7 @@ private slots:
 
 private:
     QProcess *process_;
+    QTimer *timer_;
     Ui::AnimationSaveDialog *ui;
 
 };

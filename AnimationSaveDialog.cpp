@@ -6,6 +6,7 @@ AnimationSaveDialog::AnimationSaveDialog(const QString &path, const QStringList 
     ui(new Ui::AnimationSaveDialog)
 {
     ui->setupUi(this);
+    timer_ = new QTimer(this);
     process_ = new QProcess(this);
     process_->setWorkingDirectory(path);
     connect(process_,SIGNAL(readyReadStandardOutput()),this,SLOT(ReadyRead()));
@@ -13,6 +14,8 @@ AnimationSaveDialog::AnimationSaveDialog(const QString &path, const QStringList 
     process_->start("ffmpeg", arguments);
     ui->textEdit_log->append(path);
     ui->textEdit_log->append("Saving.....");
+    connect(timer_,SIGNAL(timeout()),this,SLOT(ReadyRead()));
+    timer_->start(500);
 }
 
 AnimationSaveDialog::~AnimationSaveDialog()
@@ -33,7 +36,9 @@ void AnimationSaveDialog::on_pushButton_cancel_clicked()
 void AnimationSaveDialog::ReadyRead()
 {
     QByteArray array = process_->readAllStandardOutput();
+    qDebug()<<array.size();
     ui->textEdit_log->append(QString::fromLatin1(array));
+    ui->textEdit_log->append("Saving......");
 }
 
 void AnimationSaveDialog::Finished(int exist_code)
@@ -48,4 +53,5 @@ void AnimationSaveDialog::Finished(int exist_code)
         ui->textEdit_log->append("Failed to save");
         ui->pushButton_ok->setEnabled(false);
     }
+    timer_->stop();
 }

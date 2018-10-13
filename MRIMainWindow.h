@@ -35,6 +35,8 @@ private slots:
 
     void on_action_Set_Background_Color_triggered();
 
+    void on_action_Show_Scar_triggered(bool checked);
+
 private:
 
     void ReadImageData(const QString& filename);

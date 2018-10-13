@@ -22,9 +22,14 @@ public:
 signals:
     void PlayButtonClicked();
 
+    void PauseButtonClicked();
+
     void RecordButtonClicked();
 
     void StopButtonClicked();
+
+private slots:
+    void PlayPauseButtonClicked();
 
 
 private:

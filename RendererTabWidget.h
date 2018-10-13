@@ -95,6 +95,8 @@ public:
 
     void StartAnimation();
 
+    void PauseAnimation();
+
     void RecordButtonClicked();
 
     void StopButtonClicked();
@@ -105,12 +107,16 @@ public:
 
     void SetBackgroundColorTriggered();
 
+    void ClearAllData();
+
 
 signals:
     void WriteLogs(QString log);
 
 public slots:
     void SetActorVisibility(const QString& name, bool visibility = true);
+
+    void SetScarVisibility(bool visibility = true);
 
 private:
 
@@ -130,9 +136,15 @@ private:
 
     double time_elapsed_;
 
+    bool is_paused_;
+
     vtkSmartPointer<vtkActor> animation_actor_;
 
+    vtkSmartPointer<vtkScalarBarActor> scalarBar;
+
     vtkSmartPointer<vtkPolyDataMapper> animation_mapper_;
+
+    vtkSmartPointer<ParticleMapper> particle_mapper_;
 
     vtkSmartPointer<vtkPointLocator> point_locator_;
 
@@ -140,6 +152,7 @@ private:
 
     QString image_directory_;
 
+//    vtkActor* mesh_actor_;
     QMap<QString, vtkProp3D*> actor_map_;
     QWidget *renderer_widget_;
     VTKRenderer *renderer_;

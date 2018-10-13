@@ -81,6 +81,10 @@ MRIMainWindow::MRIMainWindow(QWidget *parent) :
         tab_widget_->StartAnimation();
     });
 
+    connect(animate_widget_,&AnimationWidget::PauseButtonClicked,[this](){
+        tab_widget_->PauseAnimation();
+    });
+
     connect(project_model_,&ProjectTreeModel::VisibilityChanged,[this](const QString& name, bool visibility){
         tab_widget_->SetActorVisibility(name, visibility);
     });
@@ -98,21 +102,22 @@ void MRIMainWindow::on_action_Import_Data_triggered()
 
     if(dialog.exec() == QDialog::Accepted)
     {
-        QStringList files = dialog.GetFiles();
-
-        for(auto file : files)
+        tab_widget_->ClearAllData();
+        if(image_Stack_item_->childCount() != 0)
         {
-            QFileInfo info(file);
-            if(info.suffix() == "vtk")
-            {
-
-                ReadMeshData(file);
-            }
-            else if(info.suffix() == "nii")
-            {
-                ReadImageData(file);
-            }
+            image_Stack_item_->removeAllChild();
         }
+        if(mesh_item_->childCount() != 0)
+        {
+            mesh_item_->removeAllChild();
+        }
+        if(activation_time_->childCount() != 0)
+        {
+            activation_time_->removeAllChild();
+        }
+        ReadMeshData(dialog.GetMeshFileName());
+        ReadMeshData(dialog.GetActivationTime());
+        ReadImageData(dialog.GetImageFileName());
         project_model_->SetRootEntity(root_item_);
         ui->treeView->expandAll();
         tab_widget_->UpdateRenderer();
@@ -275,4 +280,9 @@ void MRIMainWindow::on_action_3D_View_triggered()
 void MRIMainWindow::on_action_Set_Background_Color_triggered()
 {
     tab_widget_->SetBackgroundColorTriggered();
+}
+
+void MRIMainWindow::on_action_Show_Scar_triggered(bool checked)
+{
+    tab_widget_->SetScarVisibility(checked);
 }

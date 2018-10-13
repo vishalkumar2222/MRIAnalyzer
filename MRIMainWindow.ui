@@ -51,6 +51,7 @@
     <addaction name="action_3D_View"/>
     <addaction name="separator"/>
     <addaction name="action_Set_Background_Color"/>
+    <addaction name="action_Show_Scar"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_View"/>
@@ -118,6 +119,17 @@
   <action name="action_Set_Background_Color">
    <property name="text">
     <string>&amp;Set Background Color</string>
+   </property>
+  </action>
+  <action name="action_Show_Scar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Show Scar</string>
    </property>
   </action>
  </widget>
