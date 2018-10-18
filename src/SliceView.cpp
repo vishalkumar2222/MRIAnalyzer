@@ -1,5 +1,4 @@
 #include "SliceView.h"
-#include "ui_SliceView.h"
 #include <vtkImageMapToWindowLevelColors.h>
 
 SliceView::SliceView(QWidget *parent) :
