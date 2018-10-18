@@ -33,6 +33,11 @@ void AnimationWidget::AnimationStatus(bool status)
     }
 }
 
+int AnimationWidget::GetTimer()
+{
+    return ui->spinBox_timer->value();
+}
+
 void AnimationWidget::PlayPauseButtonClicked()
 {
     if(ui->pushButton_play_pause->text() == "Play")

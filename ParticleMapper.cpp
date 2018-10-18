@@ -2,7 +2,7 @@
 
 ParticleMapper::ParticleMapper()
 {
-    SetEmissive(false);
+    SetEmissive(true);
     SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"

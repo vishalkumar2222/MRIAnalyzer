@@ -7,6 +7,7 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
     renderer_ = new VTKRenderer();
     image_viewer_ = new SliceView();
     this->addTab(renderer_, "3D Mode");
+    this->addTab(image_viewer_, "Image Viewer");
 
 
     red = 0;
@@ -18,6 +19,7 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
     is_paused_ = false;
 
     time_elapsed_ = 0.0f;
+    activation_index_ = 0;
 
     timer_ = new QTimer(this);
 
@@ -40,20 +42,19 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
 
 void RendererTabWidget::Set3DMode()
 {
-    this->removeTab(0);
-    this->addTab(renderer_, "3D Mode");
+//    this->removeTab(0);
+//    this->addTab(renderer_, "3D Mode");
 }
 
 void RendererTabWidget::SetSliceMode()
 {
-    this->removeTab(0);
-    this->addTab(image_viewer_, "2D Mode");
-    image_viewer_->GetImageViewer()->Render();
+//    this->removeTab(0);
+//    this->addTab(image_viewer_, "2D Mode");
+//    image_viewer_->GetImageViewer()->Render();
 }
 
 void RendererTabWidget::AddImageStack(const QString &name)
 {
-
     vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
     mapper->SetInputData(RendererData::Get()->GetImageData());
 
@@ -73,7 +74,7 @@ void RendererTabWidget::AddImageStack(const QString &name)
     compositeOpacity->AddPoint(112, 0.5);
     compositeOpacity->AddPoint(176, 0.85);
     compositeOpacity->AddPoint(255, 1.0);
-    //  volumeProperty->SetScalarOpacity(compositeOpacity);
+    volumeProperty->SetScalarOpacity(compositeOpacity);
 
     vtkSmartPointer<vtkColorTransferFunction> color =
             vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -82,7 +83,7 @@ void RendererTabWidget::AddImageStack(const QString &name)
     color->AddRGBPoint(112.0, 0.51, 0.4, 0.36);
     color->AddRGBPoint(176.0, 0.78, 0.54, 0.3);
     color->AddRGBPoint(255.0, 0.9, 0.9, 0.9);
-    //  volumeProperty->SetColor(color);
+    volumeProperty->SetColor(color);
 
     volumeProperty->ShadeOn();
     volumeProperty->SetDiffuse(0, 1);
@@ -107,24 +108,31 @@ void RendererTabWidget::AddImageStack(const QString &name)
     image_viewer_->UpdateImageViewerInfo();
     image_viewer_->GetImageViewer()->SetSliceOrientationToXY();
     image_viewer_->GetImageViewer()->UpdateDisplayExtent();
+
+    image_viewer_->GetSettingsInfo().level = image_viewer_->GetImageViewer()->GetColorLevel();
+    image_viewer_->GetSettingsInfo().window = image_viewer_->GetImageViewer()->GetColorWindow();
+    image_viewer_->GetSettingsInfo().plane = ImageViewer::orientation::kXY;
+
+    image_viewer_->UpdateRenderer();
 }
 
 void RendererTabWidget::AddMesh(const QString &name)
 {
-    vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
-    banded_contour->SetInputData(RendererData::Get()->GetMeshData());
-    banded_contour->SetScalarModeToValue();
-    banded_contour->Update();
+   // vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
+   // banded_contour->SetInputData(RendererData::Get()->GetMeshData());
+   // banded_contour->SetScalarModeToValue();
+   // banded_contour->Update();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(banded_contour->GetOutputPort());
+    mapper->SetInputData(RendererData::Get()->GetMeshData());
+    mapper->SetScalarVisibility(false);
 
-    scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-    scalarBar->SetLookupTable(mapper->GetLookupTable());
-    scalarBar->SetTitle("Scar");
-    scalarBar->SetNumberOfLabels(10);
-    scalarBar->SetOrientationToVertical();
-    scalarBar->SetMaximumWidthInPixels(100);
+   // scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+   // scalarBar->SetLookupTable(mapper->GetLookupTable());
+    //scalarBar->SetTitle("Scar");
+    //scalarBar->SetNumberOfLabels(10);
+   // scalarBar->SetOrientationToVertical();
+   // scalarBar->SetMaximumWidthInPixels(100);
 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
@@ -132,21 +140,22 @@ void RendererTabWidget::AddMesh(const QString &name)
     actor_map_.insert(name, actor);
 
     renderer_->GetRenderer()->AddActor(actor);
-    renderer_->GetRenderer()->AddActor(scalarBar);
+    //renderer_->GetRenderer()->AddActor(scalarBar);
     renderer_->UpdateRenderer();
 }
 
-void RendererTabWidget::StartAnimation()
+void RendererTabWidget::StartAnimation(const int time)
 {
     if(is_paused_)
     {
-        timer_->start(500);
+        timer_->start(time);
     }
     else
     {
         time_elapsed_ = 0.0f;
         image_count_ = 0;
-        timer_->start(500);
+        activation_index_ = 0;
+        timer_->start(time);
         QDir::current().mkdir("temp");
         image_directory_ = QDir::currentPath() + "/temp/";
 
@@ -231,34 +240,25 @@ void RendererTabWidget::ClearAllData()
 void RendererTabWidget::PlayAnimation()
 {
 
-    if(RendererData::Get()->GetActivationTime().count() == 0)
+    if(RendererData::Get()->GetActivationTime().count() == activation_index_)
     {
-        timer_->stop();
-        time_elapsed_ = 0.0f;
-    }
-
-    if(time_elapsed_ >= RendererData::Get()->GetActivationTime().last())
-    {
-        time_elapsed_ = 0.0f;
+        activation_index_ = 0;
     }
 
     vtkSmartPointer<vtkCellArray> polys_cell= vtkSmartPointer<vtkCellArray>::New();
 
     vtkSmartPointer<vtkPoints> polys_points =vtkSmartPointer<vtkPoints>::New();
 
-    for(const double& time_elapsed : RendererData::Get()->GetActivationPointHash().keys())
+    const auto& activatation_list = RendererData::Get()->GetActivationPointHash().keys();
+
+    const auto& points = RendererData::Get()->GetActivationPointHash().values(activatation_list[activation_index_]);
+    for(const auto& point : points)
     {
-        if(time_elapsed <= time_elapsed_)
-        {
-            const auto& points = RendererData::Get()->GetActivationPointHash().values(time_elapsed);
-            for(const auto& point : points)
-            {
-                vtkIdType types[1];
-                types[0] = polys_points->InsertNextPoint(point.x(), point.y(), point.z());
-                polys_cell->InsertNextCell(1, types);
-            }
-        }
+        vtkIdType types[1];
+        types[0] = polys_points->InsertNextPoint(point.x(), point.y(), point.z());
+        polys_cell->InsertNextCell(1, types);
     }
+
 
     vtkSmartPointer<vtkPolyData> poly_data = vtkSmartPointer<vtkPolyData>::New();
 
@@ -266,7 +266,9 @@ void RendererTabWidget::PlayAnimation()
 
     poly_data->SetVerts(polys_cell);
 
-    animation_mapper_->SetInputData(poly_data);
+  //  animation_mapper_->SetInputData(poly_data);
+
+    particle_mapper_->SetInputData(poly_data);
 
     if(is_recording_)
     {
@@ -285,17 +287,19 @@ void RendererTabWidget::PlayAnimation()
 
     }
 
-    animation_actor_->SetMapper(animation_mapper_);
+    animation_actor_->SetMapper(particle_mapper_);
 
-    animation_actor_->GetProperty()->SetColor(0.0, 1.0, 0.0);
+   // animation_actor_->GetProperty()->SetColor(0.0, 1.0, 0.0);
 
-    animation_actor_->GetProperty()->SetPointSize(3.0);
+   // animation_actor_->GetProperty()->SetDiffuseColor(0.0,1.0,0.0);
+
+   // animation_actor_->GetProperty()->SetPointSize(0.5);
 
     renderer_->GetRenderer()->AddActor(animation_actor_);
 
     renderer_->UpdateRendererWidget();
 
-    time_elapsed_ = time_elapsed_ + 0.05;
+    ++activation_index_;
 }
 
 
@@ -312,9 +316,9 @@ void RendererTabWidget::SetScarVisibility(bool visibility)
         scalarBar->SetVisibility(visibility);
         renderer_->UpdateRenderer();
 
-//        for (const QString& name : actor_map_.keys()) {
-//            vtkProp3D *prop = actor_map_.value(name);
-//            prop->get
-//        }
+        //        for (const QString& name : actor_map_.keys()) {
+        //            vtkProp3D *prop = actor_map_.value(name);
+        //            prop->get
+        //        }
     }
 }

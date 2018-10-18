@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "RendererTabWidget.h"
 #include "RendererData.h"
+#include <QSettings>
 
 namespace Ui {
 class MRIMainWindow;

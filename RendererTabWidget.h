@@ -26,28 +26,16 @@
 #include <vtkUniformGrid.h>
 #include <vtkImageDataToUniformGrid.h>
 #include <vtkUniformGridAMR.h>
-#include <QDebug>
-#include <vtkImageDataGeometryFilter.h>
+#include <QFileDialog>
 #include <vtkProperty.h>
-#include <vtkImageReslice.h>
-#include <vtkImageSlice.h>
+#include <QDebug>
+
 #include <vtkCamera.h>
 #include <vtkErrorCode.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkMatrix4x4.h>
-#include <vtkImageViewer2.h>
-#include <vtkPolyDataConnectivityFilter.h>
-#include <vtkImageProperty.h>
 #include <vtkStructuredPoints.h>
-#include <vtkStructuredGrid.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkMolecule.h>
 #include "VTKRenderer.h"
-#include "ImportDialog.h"
 #include "AnimationWidget.h"
 #include "ParticleMapper.h"
-#include "ProjectTreeModel.h"
 #include <QTimer>
 
 
@@ -93,7 +81,7 @@ public:
 
     void AddMesh(const QString& name);
 
-    void StartAnimation();
+    void StartAnimation(const int time = 100);
 
     void PauseAnimation();
 
@@ -159,6 +147,7 @@ private:
     SliceView *image_viewer_;
     QTimer *timer_;
     int image_count_;
+    int activation_index_;
 };
 
 #endif // RENDERERTABWIDGET_H

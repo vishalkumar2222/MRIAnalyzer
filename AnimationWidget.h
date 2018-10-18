@@ -19,6 +19,8 @@ public:
 
     void AnimationStatus(bool status);
 
+    int GetTimer();
+
 signals:
     void PlayButtonClicked();
 

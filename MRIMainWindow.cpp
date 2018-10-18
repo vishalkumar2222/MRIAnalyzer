@@ -78,7 +78,7 @@ MRIMainWindow::MRIMainWindow(QWidget *parent) :
 
     connect(animate_widget_,&AnimationWidget::PlayButtonClicked,[this](){
         animate_widget_->AnimationStatus(true);
-        tab_widget_->StartAnimation();
+        tab_widget_->StartAnimation(animate_widget_->GetTimer());
     });
 
     connect(animate_widget_,&AnimationWidget::PauseButtonClicked,[this](){

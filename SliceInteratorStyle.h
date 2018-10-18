@@ -33,7 +33,6 @@ protected:
       if(_Slice < _MaxSlice) {
          _Slice += 1;
          _ImageViewer->SetSlice(_Slice);
-         _ImageViewer->GetRenderer()->ResetCamera();
          _ImageViewer->Render();
       }
    }
