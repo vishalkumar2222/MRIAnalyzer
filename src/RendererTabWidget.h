@@ -67,6 +67,8 @@
 #include <QFileInfo>
 #include <QColorDialog>
 
+class ColorDialog;
+
 class RendererTabWidget : public QTabWidget
 {
     Q_OBJECT
@@ -86,6 +88,8 @@ public:
     void PauseAnimation();
 
     void RecordButtonClicked();
+
+    void ChangeMinMaxColorActionTriggered();
 
     void StopButtonClicked();
 
@@ -132,11 +136,15 @@ private:
 
     vtkSmartPointer<vtkPolyDataMapper> animation_mapper_;
 
+    vtkSmartPointer<vtkPolyDataMapper> mesh_data_mapper_;
+
     vtkSmartPointer<ParticleMapper> particle_mapper_;
 
     vtkSmartPointer<vtkPointLocator> point_locator_;
 
     vtkSmartPointer<vtkPolyData> point_poly_data_;
+
+    vtkSmartPointer<vtkLookupTable> lookup_table_;
 
     QString image_directory_;
 

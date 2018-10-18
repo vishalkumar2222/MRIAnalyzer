@@ -52,6 +52,7 @@
     <addaction name="separator"/>
     <addaction name="action_Set_Background_Color"/>
     <addaction name="action_Show_Scar"/>
+    <addaction name="action_Change_Color_Min_Max"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_View"/>
@@ -130,6 +131,11 @@
    </property>
    <property name="text">
     <string>&amp;Show Scar</string>
+   </property>
+  </action>
+  <action name="action_Change_Color_Min_Max">
+   <property name="text">
+    <string>&amp;Change Color Min-Max</string>
    </property>
   </action>
  </widget>

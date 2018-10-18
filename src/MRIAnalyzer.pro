@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     RendererTabWidget.cpp \
     RendererData.cpp \
     AnimationSaveDialog.cpp \
-    ImageViewer.cpp
+    ImageViewer.cpp \
+    ColorDialog.cpp
 
 INCLUDEPATH += $$PWD/../../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
 DEPENDPATH += $$PWD/../../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
@@ -158,7 +159,8 @@ FORMS += MRIMainWindow.ui \
     ImportDialog.ui \
     AnimationWidget.ui \
     AnimationSaveDialog.ui \
-    ImageViewer.ui
+    ImageViewer.ui \
+    ColorDialog.ui
 
 
 HEADERS += \
@@ -174,7 +176,8 @@ HEADERS += \
     RendererTabWidget.h \
     RendererData.h \
     AnimationSaveDialog.h \
-    ImageViewer.h
+    ImageViewer.h \
+    ColorDialog.h
 
 RESOURCES += \
     images.qrc

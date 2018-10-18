@@ -286,3 +286,8 @@ void MRIMainWindow::on_action_Show_Scar_triggered(bool checked)
 {
     tab_widget_->SetScarVisibility(checked);
 }
+
+void MRIMainWindow::on_action_Change_Color_Min_Max_triggered()
+{
+    tab_widget_->ChangeMinMaxColorActionTriggered();
+}

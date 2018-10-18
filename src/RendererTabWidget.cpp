@@ -1,5 +1,5 @@
 #include "RendererTabWidget.h"
-
+#include "ColorDialog.h"
 RendererTabWidget::RendererTabWidget(QWidget *parent)
     :QTabWidget(parent)
 {
@@ -38,19 +38,23 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
 
     particle_mapper_ = vtkSmartPointer<ParticleMapper>::New();
 
+    mesh_data_mapper_ = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
+
 }
 
 void RendererTabWidget::Set3DMode()
 {
-//    this->removeTab(0);
-//    this->addTab(renderer_, "3D Mode");
+    //    this->removeTab(0);
+    //    this->addTab(renderer_, "3D Mode");
 }
 
 void RendererTabWidget::SetSliceMode()
 {
-//    this->removeTab(0);
-//    this->addTab(image_viewer_, "2D Mode");
-//    image_viewer_->GetImageViewer()->Render();
+    //    this->removeTab(0);
+    //    this->addTab(image_viewer_, "2D Mode");
+    //    image_viewer_->GetImageViewer()->Render();
 }
 
 void RendererTabWidget::AddImageStack(const QString &name)
@@ -118,29 +122,37 @@ void RendererTabWidget::AddImageStack(const QString &name)
 
 void RendererTabWidget::AddMesh(const QString &name)
 {
-   // vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
-   // banded_contour->SetInputData(RendererData::Get()->GetMeshData());
-   // banded_contour->SetScalarModeToValue();
-   // banded_contour->Update();
+    vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
+    banded_contour->SetInputData(RendererData::Get()->GetMeshData());
+    banded_contour->SetScalarModeToValue();
+    banded_contour->Update();
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(RendererData::Get()->GetMeshData());
-    mapper->SetScalarVisibility(false);
+    mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
+    lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
+    lookup_table_->SetHueRange(.667, 0);
+    lookup_table_->SetSaturationRange(1, 1);
+    lookup_table_->SetValueRange(1, 1);
+    lookup_table_->SetAboveRangeColor(1.0,0.0,0.0,1.0);
+    lookup_table_->SetBelowRangeColor(0.0,0.0,1.0,1.0);
+    lookup_table_->SetUseAboveRangeColor(1);
+    lookup_table_->SetUseBelowRangeColor(1);
+    lookup_table_->Build();
+    mesh_data_mapper_->SetLookupTable(lookup_table_);
 
-   // scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-   // scalarBar->SetLookupTable(mapper->GetLookupTable());
-    //scalarBar->SetTitle("Scar");
-    //scalarBar->SetNumberOfLabels(10);
-   // scalarBar->SetOrientationToVertical();
-   // scalarBar->SetMaximumWidthInPixels(100);
+    scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+    scalarBar->SetLookupTable(lookup_table_);
+    scalarBar->SetTitle("Scar");
+    scalarBar->SetNumberOfLabels(10);
+    scalarBar->SetOrientationToVertical();
+    scalarBar->SetMaximumWidthInPixels(100);
 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
+    actor->SetMapper(mesh_data_mapper_);
 
     actor_map_.insert(name, actor);
 
     renderer_->GetRenderer()->AddActor(actor);
-    //renderer_->GetRenderer()->AddActor(scalarBar);
+    renderer_->GetRenderer()->AddActor(scalarBar);
     renderer_->UpdateRenderer();
 }
 
@@ -170,6 +182,7 @@ void RendererTabWidget::StartAnimation(const int time)
     emit WriteLogs("Animation Started");
 }
 
+
 void RendererTabWidget::PauseAnimation()
 {
     timer_->stop();
@@ -180,6 +193,24 @@ void RendererTabWidget::RecordButtonClicked()
 {
     is_recording_ = true;
     emit WriteLogs("Recording...");
+}
+
+void RendererTabWidget::ChangeMinMaxColorActionTriggered()
+{
+    ColorDialog dialog;
+
+    double *current_min_color = lookup_table_->GetBelowRangeColor();
+    dialog.SetMinColor(QColor(current_min_color[0], current_min_color[1], current_min_color[2],current_min_color[3]));
+
+    double *current_max_color = lookup_table_->GetAboveRangeColor();
+    dialog.SetMinColor(QColor(current_max_color[0], current_max_color[1], current_max_color[2],current_max_color[3]));
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        lookup_table_->SetAboveRangeColor(dialog.GetMaxColor().redF(),dialog.GetMaxColor().greenF(),dialog.GetMaxColor().blueF(),dialog.GetMaxColor().alphaF());
+        lookup_table_->SetBelowRangeColor(dialog.GetMinColor().redF(),dialog.GetMinColor().greenF(),dialog.GetMinColor().blueF(),dialog.GetMinColor().alphaF());
+        UpdateRenderer();
+    }
 }
 
 void RendererTabWidget::StopButtonClicked()
@@ -266,7 +297,7 @@ void RendererTabWidget::PlayAnimation()
 
     poly_data->SetVerts(polys_cell);
 
-  //  animation_mapper_->SetInputData(poly_data);
+    //  animation_mapper_->SetInputData(poly_data);
 
     particle_mapper_->SetInputData(poly_data);
 
@@ -289,11 +320,11 @@ void RendererTabWidget::PlayAnimation()
 
     animation_actor_->SetMapper(particle_mapper_);
 
-   // animation_actor_->GetProperty()->SetColor(0.0, 1.0, 0.0);
+    // animation_actor_->GetProperty()->SetColor(0.0, 1.0, 0.0);
 
-   // animation_actor_->GetProperty()->SetDiffuseColor(0.0,1.0,0.0);
+    // animation_actor_->GetProperty()->SetDiffuseColor(0.0,1.0,0.0);
 
-   // animation_actor_->GetProperty()->SetPointSize(0.5);
+    // animation_actor_->GetProperty()->SetPointSize(0.5);
 
     renderer_->GetRenderer()->AddActor(animation_actor_);
 
@@ -314,6 +345,7 @@ void RendererTabWidget::SetScarVisibility(bool visibility)
     if(scalarBar.Get() != nullptr)
     {
         scalarBar->SetVisibility(visibility);
+        mesh_data_mapper_->SetScalarVisibility(visibility);
         renderer_->UpdateRenderer();
 
         //        for (const QString& name : actor_map_.keys()) {

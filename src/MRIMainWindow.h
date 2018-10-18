@@ -38,6 +38,8 @@ private slots:
 
     void on_action_Show_Scar_triggered(bool checked);
 
+    void on_action_Change_Color_Min_Max_triggered();
+
 private:
 
     void ReadImageData(const QString& filename);
