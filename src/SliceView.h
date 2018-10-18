@@ -1,20 +1,17 @@
 #ifndef SLICEVIEW_H
 #define SLICEVIEW_H
 
-#include <QWidget>
+#include <QSplitter>
 #include <QVTKOpenGLWidget.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include "SliceInteratorStyle.h"
+#include "ImageViewer.h"
 
 class SliceInteratorStyle;
 
-namespace Ui {
-class SliceView;
-}
-
-class SliceView : public QWidget
+class SliceView : public QSplitter
 {
     Q_OBJECT
 
@@ -28,9 +25,15 @@ public:
 
     void UpdateImageViewerInfo();
 
+    ImageViewer::SettingInfo &GetSettingsInfo();
+
+private slots:
+
+    void ApplyClicked();
+
 private:
-    Ui::SliceView *ui;
     QVTKOpenGLWidget *widget_;
+    ImageViewer *image_controller_;
     SliceInteratorStyle *image_interactor_style_;
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> render_window_;
     vtkSmartPointer<vtkImageViewer2> image_viewer_;

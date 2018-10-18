@@ -16,19 +16,20 @@ public:
     explicit ImportDialog(QWidget *parent = 0);
     ~ImportDialog();
 
-    QStringList GetFiles() const;
+    const QString GetImageFileName();
+    const QString GetMeshFileName();
+    const QString GetActivationTime();
 
 private slots:
-    void on_pushButton_add_clicked();
 
-    void on_pushButton_remove_clicked();
+    void on_pushButton_browse_image_clicked();
 
-    void on_listView_files_clicked(const QModelIndex &index);
+    void on_pushButton_browse_mesh_clicked();
+
+    void on_pushButton_browse_active_clicked();
 
 private:
     Ui::ImportDialog *ui;
-    QStringList files_;
-    QStringListModel *model_;
 };
 
 #endif // IMPORTDIALOG_H

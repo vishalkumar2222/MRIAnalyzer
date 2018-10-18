@@ -13,6 +13,8 @@ public:
 
     void appendChild(TreeItem *child);
 
+    void removeAllChild();
+
     TreeItem *child(int row);
     int childCount() const;
     int columnCount() const;

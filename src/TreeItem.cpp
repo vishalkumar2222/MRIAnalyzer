@@ -19,6 +19,12 @@ void TreeItem::appendChild(TreeItem *item)
     m_childItems.append(item);
 }
 
+void TreeItem::removeAllChild()
+{
+    qDeleteAll(m_childItems);
+    m_childItems.clear();
+}
+
 TreeItem *TreeItem::child(int row)
 {
     return m_childItems.value(row);

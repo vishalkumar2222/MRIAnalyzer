@@ -19,12 +19,19 @@ public:
 
     void AnimationStatus(bool status);
 
+    int GetTimer();
+
 signals:
     void PlayButtonClicked();
+
+    void PauseButtonClicked();
 
     void RecordButtonClicked();
 
     void StopButtonClicked();
+
+private slots:
+    void PlayPauseButtonClicked();
 
 
 private:

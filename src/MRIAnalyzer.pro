@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     TreeItem.cpp \
     RendererTabWidget.cpp \
     RendererData.cpp \
-    AnimationSaveDialog.cpp
+    AnimationSaveDialog.cpp \
+    ImageViewer.cpp
 
 INCLUDEPATH += $$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
 DEPENDPATH += $$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
@@ -153,11 +154,11 @@ LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/
 LIBS += -L$$PWD/../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/lib/ -lvtkzlib-8.1
 
 FORMS += MRIMainWindow.ui \
-    SliceView.ui \
     VTKRenderer.ui \
     ImportDialog.ui \
     AnimationWidget.ui \
-    AnimationSaveDialog.ui
+    AnimationSaveDialog.ui \
+    ImageViewer.ui
 
 
 HEADERS += \
@@ -172,7 +173,8 @@ HEADERS += \
     ProjectTreeModel.h \
     RendererTabWidget.h \
     RendererData.h \
-    AnimationSaveDialog.h
+    AnimationSaveDialog.h \
+    ImageViewer.h
 
 RESOURCES += \
     images.qrc

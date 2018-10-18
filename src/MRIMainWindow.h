@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "RendererTabWidget.h"
 #include "RendererData.h"
+#include <QSettings>
 
 namespace Ui {
 class MRIMainWindow;
@@ -34,6 +35,8 @@ private slots:
     void on_action_3D_View_triggered();
 
     void on_action_Set_Background_Color_triggered();
+
+    void on_action_Show_Scar_triggered(bool checked);
 
 private:
 

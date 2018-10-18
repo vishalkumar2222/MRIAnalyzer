@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImageViewer</class>
+ <widget class="QWidget" name="ImageViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>549</width>
+    <height>190</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Orientation:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="QSpinBox" name="spinBox_window">
+     <property name="minimum">
+      <number>-1315</number>
+     </property>
+     <property name="maximum">
+      <number>1315</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QSpinBox" name="spinBox_level">
+     <property name="minimum">
+      <number>-1315</number>
+     </property>
+     <property name="maximum">
+      <number>1315</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1">
+    <widget class="QSlider" name="horizontalSlider_level">
+     <property name="minimum">
+      <number>-1315</number>
+     </property>
+     <property name="maximum">
+      <number>1315</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" rowspan="2">
+    <widget class="QComboBox" name="comboBox_orientation">
+     <item>
+      <property name="text">
+       <string>XY</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>YZ</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>XZ</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Level:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QSlider" name="horizontalSlider_window">
+     <property name="minimum">
+      <number>-1315</number>
+     </property>
+     <property name="maximum">
+      <number>1315</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Window:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="pushButton_reset_camera">
+     <property name="text">
+      <string>Reset Camera</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>horizontalSlider_window</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_window</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>34</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>389</x>
+     <y>23</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_level</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_level</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>386</x>
+     <y>53</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_window</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_window</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>479</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>344</x>
+     <y>23</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_level</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_level</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

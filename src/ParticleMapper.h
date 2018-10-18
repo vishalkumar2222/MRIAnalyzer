@@ -2,10 +2,6 @@
 
 #include <vtkOpenGLPointGaussianMapper.h>
 
-/**
- * @brief Custom GaussianMapper which is used in ESS Renderer for particle rendering
- *
- */
 class ParticleMapper : public vtkOpenGLPointGaussianMapper {
 public:
     static ParticleMapper *New() {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>723</width>
-    <height>546</height>
+    <width>649</width>
+    <height>169</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,45 +15,71 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton_add">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string>Add</string>
+        <string>Image File(.nii):</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_remove">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit_image">
        <property name="text">
-        <string>Remove</string>
+        <string>/home/ess/Downloads/pig21_bssfp_cropped.nii</string>
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="pushButton_browse_image">
+       <property name="text">
+        <string>Browse</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Mesh File(.vtk):</string>
        </property>
-      </spacer>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEdit_mesh">
+       <property name="text">
+        <string>/home/ess/Downloads/pig21_trans.vtk</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="pushButton_browse_mesh">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Activation Time(.vtk):</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEdit_active">
+       <property name="text">
+        <string>/home/ess/Downloads/VT15_actTimes.vtk</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="pushButton_browse_active">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QListView" name="listView_files">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -104,22 +130,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton_ok</sender>
-   <signal>clicked()</signal>
-   <receiver>ImportDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>522</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>361</x>
-     <y>272</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
    <receiver>ImportDialog</receiver>
@@ -132,6 +142,22 @@
     <hint type="destinationlabel">
      <x>361</x>
      <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_ok</sender>
+   <signal>clicked()</signal>
+   <receiver>ImportDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>84</y>
     </hint>
    </hints>
   </connection>

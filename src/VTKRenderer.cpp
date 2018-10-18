@@ -10,14 +10,14 @@ VTKRenderer::VTKRenderer(QWidget *parent) :
     renderer_ = vtkSmartPointer<vtkRenderer>::New();
     render_window_ = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
     render_window_->AddRenderer(renderer_.Get());
-    widget_ = new QVTKOpenGLWidget(this);
+    widget_ = new QVTKOpenGLWidget;
     widget_->SetRenderWindow(render_window_.Get());
     render_window_->SetMultiSamples(0);
     renderer_->SetBackground(0.5,0.5,0.5);
     ui->verticalLayout->addWidget(widget_, 1);
-    image_style_interactor_ = vtkSmartPointer<vtkInteractorStyleImage>::New();
-    track_ball_interactor_style_ = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    render_window_->GetInteractor()->SetInteractorStyle(track_ball_interactor_style_);
+   // image_style_interactor_ = vtkSmartPointer<vtkInteractorStyleImage>::New();
+   // track_ball_interactor_style_ = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+   // render_window_->GetInteractor()->SetInteractorStyle(track_ball_interactor_style_);
 
 }
 
@@ -33,25 +33,24 @@ vtkSmartPointer<vtkRenderer> VTKRenderer::GetRenderer() const
 
 void VTKRenderer::ChangeModeTo3D()
 {
-    render_window_->GetInteractor()->SetInteractorStyle(track_ball_interactor_style_);
+    //render_window_->GetInteractor()->SetInteractorStyle(track_ball_interactor_style_);
 }
 
 void VTKRenderer::ChangeModeTo2DImage()
 {
-    render_window_->GetInteractor()->SetInteractorStyle(image_style_interactor_);
+   // render_window_->GetInteractor()->SetInteractorStyle(image_style_interactor_);
 }
 
 void VTKRenderer::UpdateRenderer()
 {
     renderer_->ResetCamera();
-    renderer_->Render();
-    this->update();
+    renderer_->GetRenderWindow()->Render();
 }
 
 void VTKRenderer::UpdateRendererWidget()
 {
     renderer_->Render();
-    this->update();
+    renderer_->GetRenderWindow()->Render();
 }
 
 

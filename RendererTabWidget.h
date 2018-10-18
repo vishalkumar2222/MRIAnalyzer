@@ -26,28 +26,16 @@
 #include <vtkUniformGrid.h>
 #include <vtkImageDataToUniformGrid.h>
 #include <vtkUniformGridAMR.h>
-#include <QDebug>
-#include <vtkImageDataGeometryFilter.h>
+#include <QFileDialog>
 #include <vtkProperty.h>
-#include <vtkImageReslice.h>
-#include <vtkImageSlice.h>
+#include <QDebug>
+
 #include <vtkCamera.h>
 #include <vtkErrorCode.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkMatrix4x4.h>
-#include <vtkImageViewer2.h>
-#include <vtkPolyDataConnectivityFilter.h>
-#include <vtkImageProperty.h>
 #include <vtkStructuredPoints.h>
-#include <vtkStructuredGrid.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkMolecule.h>
 #include "VTKRenderer.h"
-#include "ImportDialog.h"
 #include "AnimationWidget.h"
 #include "ParticleMapper.h"
-#include "ProjectTreeModel.h"
 #include <QTimer>
 
 
@@ -93,7 +81,9 @@ public:
 
     void AddMesh(const QString& name);
 
-    void StartAnimation();
+    void StartAnimation(const int time = 100);
+
+    void PauseAnimation();
 
     void RecordButtonClicked();
 
@@ -105,12 +95,16 @@ public:
 
     void SetBackgroundColorTriggered();
 
+    void ClearAllData();
+
 
 signals:
     void WriteLogs(QString log);
 
 public slots:
     void SetActorVisibility(const QString& name, bool visibility = true);
+
+    void SetScarVisibility(bool visibility = true);
 
 private:
 
@@ -130,9 +124,15 @@ private:
 
     double time_elapsed_;
 
+    bool is_paused_;
+
     vtkSmartPointer<vtkActor> animation_actor_;
 
+    vtkSmartPointer<vtkScalarBarActor> scalarBar;
+
     vtkSmartPointer<vtkPolyDataMapper> animation_mapper_;
+
+    vtkSmartPointer<ParticleMapper> particle_mapper_;
 
     vtkSmartPointer<vtkPointLocator> point_locator_;
 
@@ -140,12 +140,14 @@ private:
 
     QString image_directory_;
 
+//    vtkActor* mesh_actor_;
     QMap<QString, vtkProp3D*> actor_map_;
     QWidget *renderer_widget_;
     VTKRenderer *renderer_;
     SliceView *image_viewer_;
     QTimer *timer_;
     int image_count_;
+    int activation_index_;
 };
 
 #endif // RENDERERTABWIDGET_H
