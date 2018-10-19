@@ -47,8 +47,6 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_Slice_View"/>
-    <addaction name="action_3D_View"/>
     <addaction name="separator"/>
     <addaction name="action_Set_Background_Color"/>
     <addaction name="action_Show_Scar"/>
@@ -96,25 +94,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
-   </property>
-  </action>
-  <action name="action_Slice_View">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Slice View</string>
-   </property>
-  </action>
-  <action name="action_3D_View">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;3D View</string>
    </property>
   </action>
   <action name="action_Set_Background_Color">

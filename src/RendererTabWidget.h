@@ -132,6 +132,8 @@ private:
 
     vtkSmartPointer<vtkActor> animation_actor_;
 
+    vtkSmartPointer<vtkActor> mesh_actor_;
+
     vtkSmartPointer<vtkScalarBarActor> scalarBar;
 
     vtkSmartPointer<vtkPolyDataMapper> animation_mapper_;

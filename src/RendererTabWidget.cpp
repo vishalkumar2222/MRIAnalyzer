@@ -124,7 +124,7 @@ void RendererTabWidget::AddMesh(const QString &name)
 
     vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
     banded_contour->SetInputData(RendererData::Get()->GetMeshData());
-    banded_contour->GenerateValues(100,range[0],range[1]);
+    //banded_contour->GenerateValues(100,range[0],range[1]);
     banded_contour->SetScalarModeToValue();
     banded_contour->Update();
 
@@ -132,18 +132,11 @@ void RendererTabWidget::AddMesh(const QString &name)
 
 
     lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-    lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
-
-    lookup_table_->SetHueRange(.667, 0);
-    lookup_table_->SetSaturationRange(1, 1);
-    lookup_table_->SetValueRange(1, 1);
-    lookup_table_->SetAboveRangeColor(1.0,0.0,0.0,1.0);
-    lookup_table_->SetBelowRangeColor(0.0,0.0,1.0,1.0);
-    lookup_table_->SetUseAboveRangeColor(1);
-    lookup_table_->SetUseBelowRangeColor(1);
+    lookup_table_->SetTableRange(range);
     lookup_table_->Build();
 
     mesh_data_mapper_->SetLookupTable(lookup_table_);
+    mesh_data_mapper_->SetScalarRange(range);
 
     scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
     scalarBar->SetLookupTable(lookup_table_);
@@ -152,12 +145,13 @@ void RendererTabWidget::AddMesh(const QString &name)
     scalarBar->SetOrientationToVertical();
     scalarBar->SetMaximumWidthInPixels(100);
 
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mesh_data_mapper_);
+    mesh_actor_ = vtkSmartPointer<vtkActor>::New();
+    mesh_actor_->SetMapper(mesh_data_mapper_);
+    mesh_actor_->GetProperty()->SetInterpolationToFlat();
 
-    actor_map_.insert(name, actor);
+    actor_map_.insert(name, mesh_actor_);
 
-    renderer_->GetRenderer()->AddActor(actor);
+    renderer_->GetRenderer()->AddActor(mesh_actor_);
     renderer_->GetRenderer()->AddActor(scalarBar);
     renderer_->UpdateRenderer();
 }
@@ -219,18 +213,40 @@ void RendererTabWidget::ChangeMinMaxColorActionTriggered()
 
     if(dialog.exec() == QDialog::Accepted)
     {
+        renderer_->GetRenderer()->RemoveActor(mesh_actor_);
+        QString key = actor_map_.key(mesh_actor_);
+        actor_map_.remove(key);
+
+        vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
+        banded_contour->SetInputData(RendererData::Get()->GetMeshData());
+        banded_contour->SetScalarModeToValue();
+        banded_contour->Update();
+
+        mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
+
         lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
         lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
-        lookup_table_->SetHueRange(.667, 0);
-        lookup_table_->SetSaturationRange(1, 1);
-        lookup_table_->SetValueRange(1, 1);
-        lookup_table_->SetAboveRangeColor(1.0,0.0,0.0,1.0);
-        lookup_table_->SetBelowRangeColor(0.0,0.0,1.0,1.0);
+        //lookup_table_->SetHueRange(.667, 0);
+        //lookup_table_->SetSaturationRange(1, 1);
+        //lookup_table_->SetValueRange(1, 1);
+        lookup_table_->SetNanColor(0.0,0.0,0.0,1.0);
+        lookup_table_->SetAboveRangeColor(dialog.GetMaxColor().redF(),dialog.GetMaxColor().greenF(),dialog.GetMaxColor().blueF(),dialog.GetMaxColor().alphaF());
+        lookup_table_->SetBelowRangeColor(dialog.GetMinColor().redF(),dialog.GetMinColor().greenF(),dialog.GetMinColor().blueF(),dialog.GetMinColor().alphaF());
         lookup_table_->SetUseAboveRangeColor(1);
         lookup_table_->SetUseBelowRangeColor(1);
         lookup_table_->Build();
         mesh_data_mapper_->SetLookupTable(lookup_table_);
-        UpdateRenderer();
+
+        mesh_actor_ = vtkSmartPointer<vtkActor>::New();
+        mesh_actor_->SetMapper(mesh_data_mapper_);
+
+        scalarBar->SetLookupTable(lookup_table_);
+
+        actor_map_.insert(key,mesh_actor_);
+
+        renderer_->GetRenderer()->AddActor(mesh_actor_);
+        // renderer_->GetRenderer()->AddActor(scalarBar);
+        renderer_->UpdateRenderer();
     }
 }
 

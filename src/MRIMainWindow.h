@@ -13,6 +13,7 @@
 #include "RendererTabWidget.h"
 #include "RendererData.h"
 #include <QSettings>
+#include <QMessageBox>
 
 namespace Ui {
 class MRIMainWindow;
@@ -30,10 +31,6 @@ private slots:
 
     void on_action_Import_Data_triggered();
 
-    void on_action_Slice_View_triggered();
-
-    void on_action_3D_View_triggered();
-
     void on_action_Set_Background_Color_triggered();
 
     void on_action_Show_Scar_triggered(bool checked);
@@ -44,8 +41,6 @@ private:
 
     void ReadImageData(const QString& filename);
     void ReadMeshData(const QString& filename);
-
-    void CalculateAndSetDistanceToCell(vtkSmartPointer<vtkPolyData>& input);
 
     void SplitMeshFile(const vtkSmartPointer<vtkPolyData> &source);
 

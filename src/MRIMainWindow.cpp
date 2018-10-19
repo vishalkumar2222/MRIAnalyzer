@@ -134,7 +134,7 @@ void MRIMainWindow::ReadImageData(const QString &filename)
 
     if (reader->GetErrorCode() != vtkErrorCode::NoError)
     {
-        qDebug()<<"Error in reading";
+        QMessageBox::information(this,tr("Status"),tr("Unable to read the file."));
         return;
     }
 
@@ -179,58 +179,10 @@ void MRIMainWindow::ReadMeshData(const QString &filename)
         }
 
     }
-}
-
-void MRIMainWindow::CalculateAndSetDistanceToCell(vtkSmartPointer<vtkPolyData> &input)
-{
-    /*
-    vtkSmartPointer<vtkUnsignedCharArray> colors =
-            vtkSmartPointer<vtkUnsignedCharArray>::New();
-    colors->SetNumberOfComponents(1);
-    colors->SetName ("Distance");
-
-    // Generic type point normals
-    //    vtkDataArray* normalsGeneric = normalGenerator->GetOutput()->GetPointData()->GetNormals();
-
-    //    if(normalsGeneric != nullptr)
-    //    {
-    //        double normal[3];
-    //        for(vtkIdType id = 0; id<normalsGeneric->GetNumberOfTuples(); id++)
-    //        {
-    //            normalsGeneric->GetTuple(id, normal);
-
-    //            qDebug()<< "Normal" << normal[0] <<" , "<< normal[1]<< " , "<< normal[2];
-
-    //            vtkIdType nearest_id = point_locator_->FindClosestPoint(normal);
-
-    //            double distance =  vtkMath::Distance2BetweenPoints(normal, point_poly_data_->GetPoints()->GetPoint(nearest_id));
-
-    //            qDebug()<<distance;
-
-    //            colors->InsertNextTuple1(distance);
-    //        }
-
-
-    for(vtkIdType id = 0; id<input->GetNumberOfCells(); id++)
+    else
     {
-        vtkCell *cell = input->GetCell(id);
-        vtkPoints *points = cell->GetPoints();
-        double point[3] = {0.0,0.0,0.0};
-        points->GetPoint(0,point);
-
-        vtkIdType nearest_id = point_locator_->FindClosestPoint(point);
-
-        double distance =  vtkMath::Distance2BetweenPoints(point, point_poly_data_->GetPoints()->GetPoint(nearest_id));
-
-        colors->InsertNextTuple1(distance);
+        QMessageBox::information(this,tr("Status"),tr("Data not found!"));
     }
-
-    //    }
-
-   // input->GetCellData()->SetScalars(colors);
-
-    input->GetPointData()->SetScalars(colors);
-    */
 }
 
 void MRIMainWindow::SplitMeshFile(const vtkSmartPointer<vtkPolyData>& source)
@@ -261,21 +213,6 @@ void MRIMainWindow::SplitMeshFile(const vtkSmartPointer<vtkPolyData>& source)
 
     RendererData::Get()->SetActivationPointHash(hash);
 }
-
-void MRIMainWindow::on_action_Slice_View_triggered()
-{
-    ui->action_3D_View->setChecked(false);
-    tab_widget_->SetSliceMode();
-    animate_widget_->setVisible(false);
-}
-
-void MRIMainWindow::on_action_3D_View_triggered()
-{
-    ui->action_Slice_View->setChecked(false);
-    tab_widget_->Set3DMode();
-    animate_widget_->setVisible(true);
-}
-
 
 void MRIMainWindow::on_action_Set_Background_Color_triggered()
 {
