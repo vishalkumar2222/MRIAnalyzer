@@ -40,8 +40,6 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
 
     mesh_data_mapper_ = vtkSmartPointer<vtkPolyDataMapper>::New();
 
-    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-
 }
 
 void RendererTabWidget::Set3DMode()
@@ -78,7 +76,7 @@ void RendererTabWidget::AddImageStack(const QString &name)
     compositeOpacity->AddPoint(112, 0.5);
     compositeOpacity->AddPoint(176, 0.85);
     compositeOpacity->AddPoint(255, 1.0);
-    volumeProperty->SetScalarOpacity(compositeOpacity);
+    //  volumeProperty->SetScalarOpacity(compositeOpacity);
 
     vtkSmartPointer<vtkColorTransferFunction> color =
             vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -87,7 +85,7 @@ void RendererTabWidget::AddImageStack(const QString &name)
     color->AddRGBPoint(112.0, 0.51, 0.4, 0.36);
     color->AddRGBPoint(176.0, 0.78, 0.54, 0.3);
     color->AddRGBPoint(255.0, 0.9, 0.9, 0.9);
-    volumeProperty->SetColor(color);
+    // volumeProperty->SetColor(color);
 
     volumeProperty->ShadeOn();
     volumeProperty->SetDiffuse(0, 1);
@@ -122,13 +120,20 @@ void RendererTabWidget::AddImageStack(const QString &name)
 
 void RendererTabWidget::AddMesh(const QString &name)
 {
+    double *range = RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange();
+
     vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
     banded_contour->SetInputData(RendererData::Get()->GetMeshData());
+    banded_contour->GenerateValues(100,range[0],range[1]);
     banded_contour->SetScalarModeToValue();
     banded_contour->Update();
 
     mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
+
+
+    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
     lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
+
     lookup_table_->SetHueRange(.667, 0);
     lookup_table_->SetSaturationRange(1, 1);
     lookup_table_->SetValueRange(1, 1);
@@ -137,6 +142,7 @@ void RendererTabWidget::AddMesh(const QString &name)
     lookup_table_->SetUseAboveRangeColor(1);
     lookup_table_->SetUseBelowRangeColor(1);
     lookup_table_->Build();
+
     mesh_data_mapper_->SetLookupTable(lookup_table_);
 
     scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
@@ -200,15 +206,30 @@ void RendererTabWidget::ChangeMinMaxColorActionTriggered()
     ColorDialog dialog;
 
     double *current_min_color = lookup_table_->GetBelowRangeColor();
-    dialog.SetMinColor(QColor(current_min_color[0], current_min_color[1], current_min_color[2],current_min_color[3]));
+    QColor current_min;
+    current_min.setRgbF(current_min_color[0], current_min_color[1], current_min_color[2],current_min_color[3]);
+    dialog.SetMinColor(current_min);
+
 
     double *current_max_color = lookup_table_->GetAboveRangeColor();
-    dialog.SetMinColor(QColor(current_max_color[0], current_max_color[1], current_max_color[2],current_max_color[3]));
+    QColor current_max;
+    current_max.setRgbF(current_max_color[0], current_max_color[1], current_max_color[2],current_max_color[3]);
+
+    dialog.SetMaxColor(current_max);
 
     if(dialog.exec() == QDialog::Accepted)
     {
-        lookup_table_->SetAboveRangeColor(dialog.GetMaxColor().redF(),dialog.GetMaxColor().greenF(),dialog.GetMaxColor().blueF(),dialog.GetMaxColor().alphaF());
-        lookup_table_->SetBelowRangeColor(dialog.GetMinColor().redF(),dialog.GetMinColor().greenF(),dialog.GetMinColor().blueF(),dialog.GetMinColor().alphaF());
+        lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
+        lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
+        lookup_table_->SetHueRange(.667, 0);
+        lookup_table_->SetSaturationRange(1, 1);
+        lookup_table_->SetValueRange(1, 1);
+        lookup_table_->SetAboveRangeColor(1.0,0.0,0.0,1.0);
+        lookup_table_->SetBelowRangeColor(0.0,0.0,1.0,1.0);
+        lookup_table_->SetUseAboveRangeColor(1);
+        lookup_table_->SetUseBelowRangeColor(1);
+        lookup_table_->Build();
+        mesh_data_mapper_->SetLookupTable(lookup_table_);
         UpdateRenderer();
     }
 }

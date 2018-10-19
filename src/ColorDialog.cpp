@@ -19,16 +19,14 @@ void ColorDialog::on_pushButton_min_clicked()
 {
     QColor color = QColorDialog::getColor(min_color_,this,tr("Choose Color"), QColorDialog::DontUseNativeDialog);
 
-    min_color_ = color;
-
-
+    SetMinColor(color);
 }
 
 void ColorDialog::on_pushButton_max_clicked()
 {
     QColor color = QColorDialog::getColor(max_color_,this,tr("Choose Color"), QColorDialog::DontUseNativeDialog);
 
-    max_color_ = color;
+    SetMaxColor(color);
 }
 
 QColor ColorDialog::GetMaxColor() const
@@ -39,10 +37,12 @@ QColor ColorDialog::GetMaxColor() const
 void ColorDialog::SetMaxColor(const QColor &max_color)
 {
     max_color_ = max_color;
-    ui->pushButton_max->setStyleSheet(QString::asprintf("background-color: rgba(%d, %d, %d, %d)",max_color.red(),
-                                                        max_color.green()
-                                                        ,max_color.blue()
-                                                        ,max_color.alpha()));
+    QString color = QString::asprintf("background-color: rgba(%d, %d, %d, %d)",max_color_.red(),
+                                      max_color_.green()
+                                      ,max_color_.blue()
+                                      ,max_color_.alpha());
+
+    ui->pushButton_max->setStyleSheet(color);
 }
 
 QColor ColorDialog::GetMinColor() const
@@ -53,8 +53,10 @@ QColor ColorDialog::GetMinColor() const
 void ColorDialog::SetMinColor(const QColor &min_color)
 {
     min_color_ = min_color;
-    ui->pushButton_max->setStyleSheet(QString::asprintf("background-color: rgba(%d, %d, %d, %d)",min_color.red(),
-                                                        min_color.green()
-                                                        ,min_color.blue()
-                                                        ,min_color.alpha()));
+    QString color = QString::asprintf("background-color: rgba(%d, %d, %d, %d)",min_color_.red(),
+                                      min_color_.green()
+                                      ,min_color_.blue()
+                                      ,min_color_.alpha());
+
+    ui->pushButton_min->setStyleSheet(color);
 }
