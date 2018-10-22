@@ -10,8 +10,6 @@
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkDoubleArray.h>
-#include <QDebug>
-
 class RendererData : public QObject
 {
     Q_OBJECT
@@ -32,6 +30,10 @@ public:
     QList<float> GetActivationTime() const;
     void SetActivationTime(const QList<float> &activation_time);
 
+    vtkSmartPointer<vtkPolyData> GetActivationData() const;
+
+    void SetActivationData(const vtkSmartPointer<vtkPolyData> &activation_data);
+
 signals:
 
 public slots:
@@ -39,6 +41,7 @@ public slots:
 private:
 
     vtkSmartPointer<vtkPolyData> mesh_data_;
+    vtkSmartPointer<vtkPolyData> activation_data_;
     vtkSmartPointer<vtkImageData> image_data_;
     QMultiHash<float, QVector3D> activation_point_hash_;
     QList<float> activation_time_;

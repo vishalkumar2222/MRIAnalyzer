@@ -66,6 +66,7 @@
 #include <QFileInfoList>
 #include <QFileInfo>
 #include <QColorDialog>
+#include <vtkCornerAnnotation.h>
 
 class ColorDialog;
 
@@ -74,10 +75,6 @@ class RendererTabWidget : public QTabWidget
     Q_OBJECT
 public:
     RendererTabWidget(QWidget *parent = nullptr);
-
-    void Set3DMode();
-
-    void SetSliceMode();
 
     void AddImageStack(const QString& name);
 
@@ -101,14 +98,17 @@ public:
 
     void ClearAllData();
 
-
 signals:
     void WriteLogs(QString log);
 
 public slots:
     void SetActorVisibility(const QString& name, bool visibility = true);
 
-    void SetScarVisibility(bool visibility = true);
+    void ShowScar();
+
+    void ShowInterpolatedActivationTime();
+
+    void ShowImageInterpolation();
 
 private:
 
@@ -131,6 +131,8 @@ private:
     bool is_paused_;
 
     vtkSmartPointer<vtkActor> animation_actor_;
+
+    vtkSmartPointer<vtkCornerAnnotation> annotation_;
 
     vtkSmartPointer<vtkActor> mesh_actor_;
 

@@ -49,8 +49,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="action_Set_Background_Color"/>
-    <addaction name="action_Show_Scar"/>
-    <addaction name="action_Change_Color_Min_Max"/>
+    <addaction name="action_Color_Map_Editor"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_View"/>
@@ -75,6 +74,9 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QTreeView" name="treeView">
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
        <property name="headerHidden">
         <bool>true</bool>
        </property>
@@ -102,19 +104,21 @@
    </property>
   </action>
   <action name="action_Show_Scar">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>&amp;Show Scar</string>
    </property>
+   <property name="toolTip">
+    <string>Show Scar Value</string>
+   </property>
   </action>
-  <action name="action_Change_Color_Min_Max">
+  <action name="action_Show_Activation_Time">
    <property name="text">
-    <string>&amp;Change Color Min-Max</string>
+    <string>&amp;Show Activation Time</string>
+   </property>
+  </action>
+  <action name="action_Color_Map_Editor">
+   <property name="text">
+    <string>&amp;Color Map Editor</string>
    </property>
   </action>
  </widget>

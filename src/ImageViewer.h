@@ -19,6 +19,9 @@ public:
         int window;
         int level;
         orientation plane;
+        int min_slice_;
+        int max_slice_;
+        int current_slice_;
     };
 
     explicit ImageViewer(QWidget *parent = 0);

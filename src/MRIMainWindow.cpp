@@ -1,7 +1,7 @@
 #include "MRIMainWindow.h"
 #include "ui_MRIMainWindow.h"
 #include "TreeItem.h"
-
+#include "AppManager.h"
 #include <vtkCellData.h>
 
 MRIMainWindow::MRIMainWindow(QWidget *parent) :
@@ -63,6 +63,9 @@ MRIMainWindow::MRIMainWindow(QWidget *parent) :
     ui->verticalLayout_main->addWidget(tab_widget_);
     ui->verticalLayout_main->addWidget(animate_widget_);
 
+    context_menu_ = new QMenu();
+    context_menu_->addActions(QList<QAction*>()<<ui->action_Show_Scar<<ui->action_Show_Activation_Time);
+
     connect(animate_widget_,&AnimationWidget::StopButtonClicked, [this](){
         tab_widget_->StopButtonClicked();
         animate_widget_->AnimationStatus(false);
@@ -118,6 +121,12 @@ void MRIMainWindow::on_action_Import_Data_triggered()
         ReadMeshData(dialog.GetMeshFileName());
         ReadMeshData(dialog.GetActivationTime());
         ReadImageData(dialog.GetImageFileName());
+        AppManager::Get()->GetSettings()->setValue("image", dialog.GetImageFileName());
+        AppManager::Get()->GetSettings()->setValue("mesh", dialog.GetMeshFileName());
+        AppManager::Get()->GetSettings()->setValue("active", dialog.GetActivationTime());
+
+        tab_widget_->ShowImageInterpolation();
+
         project_model_->SetRootEntity(root_item_);
         ui->treeView->expandAll();
         tab_widget_->UpdateRenderer();
@@ -157,14 +166,14 @@ void MRIMainWindow::ReadMeshData(const QString &filename)
 
     QFileInfo info(filename);
 
-
-
     // All of the standard data types can be checked and obtained like this:
     if(reader->IsFilePolyData())
     {
         if(reader->GetPolyDataOutput()->GetNumberOfVerts() > 0)
         {
             this->SplitMeshFile(reader->GetPolyDataOutput());
+
+            RendererData::Get()->SetActivationData(reader->GetPolyDataOutput());
 
             TreeItem *item = new TreeItem(info.baseName(), activation_time_, false);
             activation_time_->appendChild(item);
@@ -187,6 +196,7 @@ void MRIMainWindow::ReadMeshData(const QString &filename)
 
 void MRIMainWindow::SplitMeshFile(const vtkSmartPointer<vtkPolyData>& source)
 {
+
     vtkDataArray *scalers = source->GetCellData()->GetScalars();
 
     QMultiHash<float, QVector3D> hash;
@@ -219,12 +229,39 @@ void MRIMainWindow::on_action_Set_Background_Color_triggered()
     tab_widget_->SetBackgroundColorTriggered();
 }
 
-void MRIMainWindow::on_action_Show_Scar_triggered(bool checked)
+void MRIMainWindow::on_action_Show_Scar_triggered()
 {
-    tab_widget_->SetScarVisibility(checked);
+    tab_widget_->ShowScar();
 }
 
-void MRIMainWindow::on_action_Change_Color_Min_Max_triggered()
+void MRIMainWindow::on_action_Show_Activation_Time_triggered()
+{
+    tab_widget_->ShowInterpolatedActivationTime();
+}
+
+void MRIMainWindow::on_action_Color_Map_Editor_triggered()
 {
     tab_widget_->ChangeMinMaxColorActionTriggered();
+}
+
+void MRIMainWindow::on_treeView_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = ui->treeView->indexAt(pos);
+
+    if(index.isValid())
+    {
+        TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+
+        if(item != nullptr)
+        {
+            if(item->IsMesh())
+
+            {
+                if(item->parentItem()->GetName()=="Mesh")
+                {
+                    context_menu_->exec(ui->treeView->mapToGlobal(pos));
+                }
+            }
+        }
+    }
 }

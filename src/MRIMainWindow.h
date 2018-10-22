@@ -12,8 +12,8 @@
 #include <algorithm>
 #include "RendererTabWidget.h"
 #include "RendererData.h"
-#include <QSettings>
 #include <QMessageBox>
+#include <QMenu>
 
 namespace Ui {
 class MRIMainWindow;
@@ -33,9 +33,14 @@ private slots:
 
     void on_action_Set_Background_Color_triggered();
 
-    void on_action_Show_Scar_triggered(bool checked);
+    void on_action_Show_Scar_triggered();
 
-    void on_action_Change_Color_Min_Max_triggered();
+    void on_action_Show_Activation_Time_triggered();
+
+    void on_action_Color_Map_Editor_triggered();
+
+
+    void on_treeView_customContextMenuRequested(const QPoint &pos);
 
 private:
 
@@ -52,6 +57,7 @@ private:
     TreeItem *mesh_item_;
     TreeItem *activation_time_;
     RendererTabWidget *tab_widget_;
+    QMenu *context_menu_;
 
 };
 

@@ -24,11 +24,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_image">
-       <property name="text">
-        <string>/home/ess/Downloads/pig21_bssfp_cropped.nii</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lineEdit_image"/>
      </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="pushButton_browse_image">
@@ -45,11 +41,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_mesh">
-       <property name="text">
-        <string>/home/ess/Downloads/pig21_trans.vtk</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lineEdit_mesh"/>
      </item>
      <item row="1" column="2">
       <widget class="QPushButton" name="pushButton_browse_mesh">
@@ -66,11 +58,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_active">
-       <property name="text">
-        <string>/home/ess/Downloads/VT15_actTimes.vtk</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lineEdit_active"/>
      </item>
      <item row="2" column="2">
       <widget class="QPushButton" name="pushButton_browse_active">

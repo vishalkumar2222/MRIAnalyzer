@@ -1,6 +1,7 @@
 #ifndef SLICEINTERATORSTYLE_H
 #define SLICEINTERATORSTYLE_H
 
+
 #include <vtkSmartPointer.h>
 #include <vtkObjectFactory.h>
 // headers needed for this example
@@ -8,6 +9,9 @@
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
+#include "SliceView.h"
+
+
 
 // Define own interaction style
 class SliceInteratorStyle : public vtkInteractorStyleImage
@@ -18,13 +22,20 @@ protected:
    int _Slice;
    int _MinSlice;
    int _MaxSlice;
+   SliceView *viewer_;
 
 public:
-   void SetImageViewer(vtkImageViewer2* imageViewer) {
+   void SetImageViewer(vtkImageViewer2* imageViewer, SliceView *viewer = nullptr) {
       _ImageViewer = imageViewer;
       _MinSlice = imageViewer->GetSliceMin();
       _MaxSlice = imageViewer->GetSliceMax();
       _Slice = _MinSlice;
+      viewer_ = viewer;
+   }
+
+   void SetCurrentSlice(int slice){
+       _Slice = slice;
+       _ImageViewer->SetSlice(slice);
    }
 
 
@@ -34,6 +45,7 @@ protected:
          _Slice += 1;
          _ImageViewer->SetSlice(_Slice);
          _ImageViewer->Render();
+         viewer_->CurrentSliceChanged(_Slice);
       }
    }
 
@@ -42,6 +54,7 @@ protected:
          _Slice -= 1;
          _ImageViewer->SetSlice(_Slice);
          _ImageViewer->Render();
+         viewer_->CurrentSliceChanged(_Slice);
       }
    }
 

@@ -36,6 +36,11 @@ void ImageViewer::SetInfo()
     {
         ui->comboBox_orientation->setCurrentText("XZ");
     }
+
+    ui->spinBox_slices->setRange(info_.min_slice_, info_.max_slice_);
+    ui->horizontalSlider_slices->setRange(info_.min_slice_, info_.max_slice_);
+
+    ui->horizontalSlider_slices->setValue(info_.current_slice_);
 }
 
 ImageViewer::SettingInfo &ImageViewer::GetInfo()
@@ -59,6 +64,8 @@ void ImageViewer::ValueChanged()
     {
         info_.plane = orientation::kXZ;
     }
+
+    info_.current_slice_ = ui->horizontalSlider_slices->value();
 
     emit ApplyClicked();
 }

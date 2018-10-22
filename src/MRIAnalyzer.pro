@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     RendererData.cpp \
     AnimationSaveDialog.cpp \
     ImageViewer.cpp \
-    ColorDialog.cpp
+    ColorDialog.cpp \
+    AppManager.cpp
 
 INCLUDEPATH += $$PWD/../../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
 DEPENDPATH += $$PWD/../../../DevelopmentCode/ThirdPartyLibraries/VTK-8.1.0_INSTALL/include/vtk-8.1
@@ -177,7 +178,8 @@ HEADERS += \
     RendererData.h \
     AnimationSaveDialog.h \
     ImageViewer.h \
-    ColorDialog.h
+    ColorDialog.h \
+    AppManager.h
 
 RESOURCES += \
     images.qrc

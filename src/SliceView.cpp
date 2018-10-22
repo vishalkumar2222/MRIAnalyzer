@@ -42,12 +42,19 @@ vtkSmartPointer<vtkImageViewer2> SliceView::GetImageViewer() const
 
 void SliceView::UpdateImageViewerInfo()
 {
-    image_interactor_style_->SetImageViewer(image_viewer_);
+    image_interactor_style_->SetImageViewer(image_viewer_, this);
 }
 
 ImageViewer::SettingInfo &SliceView::GetSettingsInfo()
 {
     return image_controller_->GetInfo();
+}
+
+void SliceView::CurrentSliceChanged(int slice)
+{
+   image_controller_->GetInfo().current_slice_ = slice;
+
+   image_controller_->SetInfo();
 }
 
 void SliceView::ApplyClicked()
@@ -67,6 +74,8 @@ void SliceView::ApplyClicked()
     {
         image_viewer_->SetSliceOrientationToXZ();
     }
+
+    image_interactor_style_->SetCurrentSlice(image_controller_->GetInfo().current_slice_);
 
     image_viewer_->Render();
 }

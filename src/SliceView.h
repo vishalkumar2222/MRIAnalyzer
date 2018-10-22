@@ -27,6 +27,8 @@ public:
 
     ImageViewer::SettingInfo &GetSettingsInfo();
 
+    void CurrentSliceChanged(int slice);
+
 private slots:
 
     void ApplyClicked();

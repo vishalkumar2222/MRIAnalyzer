@@ -1,5 +1,11 @@
 #include "RendererTabWidget.h"
 #include "ColorDialog.h"
+#include <vtkPointInterpolator.h>
+#include <vtkLinearKernel.h>
+#include <vtkPolyDataWriter.h>
+#include <vtkCellDataToPointData.h>
+#include <vtkProbeFilter.h>
+
 RendererTabWidget::RendererTabWidget(QWidget *parent)
     :QTabWidget(parent)
 {
@@ -40,19 +46,8 @@ RendererTabWidget::RendererTabWidget(QWidget *parent)
 
     mesh_data_mapper_ = vtkSmartPointer<vtkPolyDataMapper>::New();
 
-}
+    scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
 
-void RendererTabWidget::Set3DMode()
-{
-    //    this->removeTab(0);
-    //    this->addTab(renderer_, "3D Mode");
-}
-
-void RendererTabWidget::SetSliceMode()
-{
-    //    this->removeTab(0);
-    //    this->addTab(image_viewer_, "2D Mode");
-    //    image_viewer_->GetImageViewer()->Render();
 }
 
 void RendererTabWidget::AddImageStack(const QString &name)
@@ -114,45 +109,26 @@ void RendererTabWidget::AddImageStack(const QString &name)
     image_viewer_->GetSettingsInfo().level = image_viewer_->GetImageViewer()->GetColorLevel();
     image_viewer_->GetSettingsInfo().window = image_viewer_->GetImageViewer()->GetColorWindow();
     image_viewer_->GetSettingsInfo().plane = ImageViewer::orientation::kXY;
+    image_viewer_->GetSettingsInfo().min_slice_ = image_viewer_->GetImageViewer()->GetSliceMin();
+    image_viewer_->GetSettingsInfo().max_slice_ = image_viewer_->GetImageViewer()->GetSliceMax();
+    image_viewer_->GetSettingsInfo().current_slice_ = image_viewer_->GetImageViewer()->GetSliceMin();
 
     image_viewer_->UpdateRenderer();
+
 }
+
 
 void RendererTabWidget::AddMesh(const QString &name)
 {
-    double *range = RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange();
-
-    vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
-    banded_contour->SetInputData(RendererData::Get()->GetMeshData());
-    //banded_contour->GenerateValues(100,range[0],range[1]);
-    banded_contour->SetScalarModeToValue();
-    banded_contour->Update();
-
-    mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
-
-
-    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-    lookup_table_->SetTableRange(range);
-    lookup_table_->Build();
-
-    mesh_data_mapper_->SetLookupTable(lookup_table_);
-    mesh_data_mapper_->SetScalarRange(range);
-
-    scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-    scalarBar->SetLookupTable(lookup_table_);
-    scalarBar->SetTitle("Scar");
-    scalarBar->SetNumberOfLabels(10);
-    scalarBar->SetOrientationToVertical();
-    scalarBar->SetMaximumWidthInPixels(100);
+    mesh_data_mapper_->SetInputData(RendererData::Get()->GetMeshData());
+    mesh_data_mapper_->SetScalarVisibility(0);
 
     mesh_actor_ = vtkSmartPointer<vtkActor>::New();
     mesh_actor_->SetMapper(mesh_data_mapper_);
-    mesh_actor_->GetProperty()->SetInterpolationToFlat();
 
     actor_map_.insert(name, mesh_actor_);
 
     renderer_->GetRenderer()->AddActor(mesh_actor_);
-    renderer_->GetRenderer()->AddActor(scalarBar);
     renderer_->UpdateRenderer();
 }
 
@@ -177,6 +153,12 @@ void RendererTabWidget::StartAnimation(const int time)
             QFile file(info.absoluteFilePath());
             file.remove();
         }
+
+        renderer_->GetRenderer()->RemoveViewProp(annotation_);
+
+        annotation_ = vtkSmartPointer<vtkCornerAnnotation>::New();
+
+        renderer_->GetRenderer()->AddViewProp(annotation_);
     }
 
     emit WriteLogs("Animation Started");
@@ -290,7 +272,7 @@ void RendererTabWidget::SetBackgroundColorTriggered()
     color.setBlueF(rawcolor[2]);
     color.setAlphaF(renderer_->GetRenderer()->GetBackgroundAlpha());
 
-    QColor new_color  = QColorDialog::getColor(color,this,tr("Choose Color"));
+    QColor new_color  = QColorDialog::getColor(color,this,tr("Choose Color"),QColorDialog::DontUseNativeDialog);
 
     renderer_->GetRenderer()->SetBackground(new_color.redF(), new_color.greenF() ,new_color.blueF());
     renderer_->GetRenderer()->SetBackgroundAlpha(new_color.alphaF());
@@ -317,9 +299,11 @@ void RendererTabWidget::PlayAnimation()
 
     vtkSmartPointer<vtkPoints> polys_points =vtkSmartPointer<vtkPoints>::New();
 
-    const auto& activatation_list = RendererData::Get()->GetActivationPointHash().keys();
+    const auto& activation_list = RendererData::Get()->GetActivationPointHash().keys();
 
-    const auto& points = RendererData::Get()->GetActivationPointHash().values(activatation_list[activation_index_]);
+    annotation_->SetText(1, std::to_string(activation_list[activation_index_]).c_str());
+
+    const auto& points = RendererData::Get()->GetActivationPointHash().values(activation_list[activation_index_]);
     for(const auto& point : points)
     {
         vtkIdType types[1];
@@ -377,17 +361,102 @@ void RendererTabWidget::SetActorVisibility(const QString &name, bool visibility)
     renderer_->UpdateRenderer();
 }
 
-void RendererTabWidget::SetScarVisibility(bool visibility)
-{
-    if(scalarBar.Get() != nullptr)
-    {
-        scalarBar->SetVisibility(visibility);
-        mesh_data_mapper_->SetScalarVisibility(visibility);
-        renderer_->UpdateRenderer();
 
-        //        for (const QString& name : actor_map_.keys()) {
-        //            vtkProp3D *prop = actor_map_.value(name);
-        //            prop->get
-        //        }
-    }
+void RendererTabWidget::ShowScar()
+{
+    double *range = RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange();
+
+    vtkSmartPointer<vtkBandedPolyDataContourFilter> banded_contour = vtkSmartPointer<vtkBandedPolyDataContourFilter>::New();
+    banded_contour->SetInputData(RendererData::Get()->GetMeshData());
+    banded_contour->SetScalarModeToValue();
+    banded_contour->Update();
+
+    mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
+    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
+    lookup_table_->SetTableRange(range);
+    lookup_table_->Build();
+
+    mesh_data_mapper_->SetLookupTable(lookup_table_);
+    mesh_data_mapper_->SetScalarRange(range);
+    mesh_data_mapper_->SetScalarVisibility(1);
+
+    scalarBar->SetLookupTable(lookup_table_);
+    scalarBar->SetTitle("Scar");
+    scalarBar->SetNumberOfLabels(10);
+    scalarBar->SetOrientationToVertical();
+    scalarBar->SetMaximumWidthInPixels(100);
+
+    mesh_actor_->SetMapper(mesh_data_mapper_);
+    mesh_actor_->GetProperty()->SetInterpolationToFlat();
+
+    renderer_->GetRenderer()->AddActor(scalarBar);
+
+    renderer_->UpdateRenderer();
+
+}
+
+void RendererTabWidget::ShowInterpolatedActivationTime()
+{
+    vtkSmartPointer<vtkCellDataToPointData> cell_point = vtkSmartPointer<vtkCellDataToPointData>::New();
+    cell_point->SetInputData(RendererData::Get()->GetActivationData());
+    vtkSmartPointer<vtkPointInterpolator> interpolator = vtkSmartPointer<vtkPointInterpolator>::New();
+    interpolator->SetInputData(RendererData::Get()->GetMeshData());
+    interpolator->SetSourceConnection(cell_point->GetOutputPort());
+
+    vtkSmartPointer<vtkLinearKernel> kernel = vtkSmartPointer<vtkLinearKernel>::New();
+
+    interpolator->SetKernel(kernel);
+
+    interpolator->Update();
+
+
+    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
+    lookup_table_->SetTableRange(interpolator->GetOutput()->GetScalarRange());
+    lookup_table_->Build();
+
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(interpolator->GetOutputPort());
+    mesh_data_mapper_->SetInputConnection(interpolator->GetOutputPort());
+    // particle_mapper_->SetInputConnection(interpolator->GetOutputPort());
+
+    mesh_data_mapper_->SetLookupTable(lookup_table_);
+    mesh_data_mapper_->SetScalarRange(interpolator->GetOutput()->GetScalarRange());
+    mesh_data_mapper_->SetScalarVisibility(1);
+
+    scalarBar->SetLookupTable(lookup_table_);
+    scalarBar->SetTitle("Activation Time");
+    scalarBar->SetNumberOfLabels(10);
+    scalarBar->SetOrientationToVertical();
+    scalarBar->SetMaximumWidthInPixels(100);
+
+    mesh_actor_->SetMapper(mesh_data_mapper_);
+
+    renderer_->GetRenderer()->AddActor(scalarBar);
+
+    renderer_->UpdateRenderer();
+}
+
+void RendererTabWidget::ShowImageInterpolation()
+{
+//    vtkSmartPointer<vtkCellDataToPointData> cell_point = vtkSmartPointer<vtkCellDataToPointData>::New();
+//    cell_point->SetInputData(RendererData::Get()->GetActivationData());
+
+//    vtkSmartPointer<vtkProbeFilter> probe =
+//      vtkSmartPointer<vtkProbeFilter>::New();
+
+//    probe->SetSourceData(RendererData::Get()->GetImageData());
+//    probe->SetInputData(cell_point->GetOutput());
+
+//    probe->Update();
+
+//    image_viewer_->GetImageViewer()->SetInputData(vtkImageData::SafeDownCast(probe->GetOutput()));
+//    image_viewer_->UpdateImageViewerInfo();
+//    image_viewer_->GetImageViewer()->SetSliceOrientationToXY();
+//    image_viewer_->GetImageViewer()->UpdateDisplayExtent();
+
+//    image_viewer_->GetSettingsInfo().level = image_viewer_->GetImageViewer()->GetColorLevel();
+//    image_viewer_->GetSettingsInfo().window = image_viewer_->GetImageViewer()->GetColorWindow();
+//    image_viewer_->GetSettingsInfo().plane = ImageViewer::orientation::kXY;
+
+//    image_viewer_->UpdateRenderer();
 }

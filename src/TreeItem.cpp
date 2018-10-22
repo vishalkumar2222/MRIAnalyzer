@@ -65,6 +65,11 @@ bool TreeItem::IsMesh() const
     return is_mesh_;
 }
 
+QString TreeItem::GetName() const
+{
+    return name_;
+}
+
 int TreeItem::row() const
 {
     if (m_parentItem)

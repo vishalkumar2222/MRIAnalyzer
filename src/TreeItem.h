@@ -27,6 +27,8 @@ public:
 
     bool IsMesh() const;
 
+    QString GetName() const;
+
 private:
     QList<TreeItem*> m_childItems;
     QString name_;

@@ -32,6 +32,17 @@ void RendererData::SetActivationTime(const QList<float> &activation_time)
     activation_time_ = activation_time;
 }
 
+vtkSmartPointer<vtkPolyData> RendererData::GetActivationData() const
+{
+    return activation_data_;
+}
+
+void RendererData::SetActivationData(const vtkSmartPointer<vtkPolyData> &activation_data)
+{
+    activation_data_ = vtkSmartPointer<vtkPolyData>::New();
+    activation_data_->DeepCopy(activation_data);
+}
+
 vtkSmartPointer<vtkPolyData> RendererData::GetMeshData() const
 {
     return mesh_data_;

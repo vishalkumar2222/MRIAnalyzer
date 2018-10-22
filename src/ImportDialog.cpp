@@ -1,11 +1,16 @@
 #include "ImportDialog.h"
 #include "ui_ImportDialog.h"
+#include "AppManager.h"
 
 ImportDialog::ImportDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ImportDialog)
 {
     ui->setupUi(this);
+
+    ui->lineEdit_image->setText(AppManager::Get()->GetSettings()->value("image").toString());
+    ui->lineEdit_mesh->setText(AppManager::Get()->GetSettings()->value("mesh").toString());
+    ui->lineEdit_active->setText(AppManager::Get()->GetSettings()->value("active").toString());
 }
 
 ImportDialog::~ImportDialog()
@@ -27,6 +32,7 @@ const QString ImportDialog::GetActivationTime()
 {
     return ui->lineEdit_active->text();
 }
+
 
 void ImportDialog::on_pushButton_browse_image_clicked()
 {
