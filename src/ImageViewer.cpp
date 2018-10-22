@@ -12,6 +12,8 @@ ImageViewer::ImageViewer(QWidget *parent) :
     connect(ui->spinBox_level,SIGNAL(valueChanged(int)),SLOT(ValueChanged()));
     connect(ui->spinBox_window,SIGNAL(valueChanged(int)),SLOT(ValueChanged()));
     connect(ui->comboBox_orientation,SIGNAL(currentIndexChanged(int)),SLOT(ValueChanged()));
+    connect(ui->horizontalSlider_slices,SIGNAL(valueChanged(int)),SLOT(ValueChanged()));
+    connect(ui->spinBox_slices,SIGNAL(valueChanged(int)),SLOT(ValueChanged()));
     connect(ui->pushButton_reset_camera,SIGNAL(clicked(bool)),this,SLOT(ValueChanged()));
 }
 

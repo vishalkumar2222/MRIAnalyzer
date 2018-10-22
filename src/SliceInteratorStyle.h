@@ -9,9 +9,9 @@
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include "SliceView.h"
+#include "ImageViewer.h"
 
-
+class ImageViewer;
 
 // Define own interaction style
 class SliceInteratorStyle : public vtkInteractorStyleImage
@@ -22,10 +22,10 @@ protected:
    int _Slice;
    int _MinSlice;
    int _MaxSlice;
-   SliceView *viewer_;
+   ImageViewer *viewer_;
 
 public:
-   void SetImageViewer(vtkImageViewer2* imageViewer, SliceView *viewer = nullptr) {
+   void SetImageViewer(vtkImageViewer2* imageViewer, ImageViewer *viewer = nullptr) {
       _ImageViewer = imageViewer;
       _MinSlice = imageViewer->GetSliceMin();
       _MaxSlice = imageViewer->GetSliceMax();
@@ -45,7 +45,8 @@ protected:
          _Slice += 1;
          _ImageViewer->SetSlice(_Slice);
          _ImageViewer->Render();
-         viewer_->CurrentSliceChanged(_Slice);
+         viewer_->GetInfo().current_slice_ = _Slice;
+         viewer_->SetInfo();
       }
    }
 
@@ -54,7 +55,8 @@ protected:
          _Slice -= 1;
          _ImageViewer->SetSlice(_Slice);
          _ImageViewer->Render();
-         viewer_->CurrentSliceChanged(_Slice);
+         viewer_->GetInfo().current_slice_ = _Slice;
+         viewer_->SetInfo();
       }
    }
 
