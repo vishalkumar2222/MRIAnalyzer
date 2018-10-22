@@ -181,15 +181,17 @@ void RendererTabWidget::ChangeMinMaxColorActionTriggered()
 {
     ColorDialog dialog;
 
-    double *current_min_color = lookup_table_->GetBelowRangeColor();
+    double *range = color_transfer_function_->GetRange();
+
+    double *current_min_color = color_transfer_function_->GetColor(range[0]);
     QColor current_min;
-    current_min.setRgbF(current_min_color[0], current_min_color[1], current_min_color[2],current_min_color[3]);
+    current_min.setRgbF(current_min_color[0], current_min_color[1], current_min_color[2]);
     dialog.SetMinColor(current_min);
 
 
-    double *current_max_color = lookup_table_->GetAboveRangeColor();
+    double *current_max_color = color_transfer_function_->GetColor(range[1]);
     QColor current_max;
-    current_max.setRgbF(current_max_color[0], current_max_color[1], current_max_color[2],current_max_color[3]);
+    current_max.setRgbF(current_max_color[0], current_max_color[1], current_max_color[2]);
 
     dialog.SetMaxColor(current_max);
 
@@ -206,23 +208,15 @@ void RendererTabWidget::ChangeMinMaxColorActionTriggered()
 
         mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
 
-        lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-        lookup_table_->SetTableRange(RendererData::Get()->GetMeshData()->GetPointData()->GetScalars()->GetRange());
-        //lookup_table_->SetHueRange(.667, 0);
-        //lookup_table_->SetSaturationRange(1, 1);
-        //lookup_table_->SetValueRange(1, 1);
-        lookup_table_->SetNanColor(0.0,0.0,0.0,1.0);
-        lookup_table_->SetAboveRangeColor(dialog.GetMaxColor().redF(),dialog.GetMaxColor().greenF(),dialog.GetMaxColor().blueF(),dialog.GetMaxColor().alphaF());
-        lookup_table_->SetBelowRangeColor(dialog.GetMinColor().redF(),dialog.GetMinColor().greenF(),dialog.GetMinColor().blueF(),dialog.GetMinColor().alphaF());
-        lookup_table_->SetUseAboveRangeColor(1);
-        lookup_table_->SetUseBelowRangeColor(1);
-        lookup_table_->Build();
-        mesh_data_mapper_->SetLookupTable(lookup_table_);
+        color_transfer_function_->AddRGBPoint(range[0], dialog.GetMinColor().redF(),dialog.GetMinColor().greenF(),dialog.GetMinColor().blueF());
+        color_transfer_function_->AddRGBPoint(range[1], dialog.GetMaxColor().redF(),dialog.GetMaxColor().greenF(),dialog.GetMaxColor().blueF());
+        color_transfer_function_->Build();
+        mesh_data_mapper_->SetLookupTable(color_transfer_function_);
 
         mesh_actor_ = vtkSmartPointer<vtkActor>::New();
         mesh_actor_->SetMapper(mesh_data_mapper_);
 
-        scalarBar->SetLookupTable(lookup_table_);
+        scalarBar->SetLookupTable(color_transfer_function_);
 
         actor_map_.insert(key,mesh_actor_);
 
@@ -372,15 +366,16 @@ void RendererTabWidget::ShowScar()
     banded_contour->Update();
 
     mesh_data_mapper_->SetInputConnection(banded_contour->GetOutputPort());
-    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-    lookup_table_->SetTableRange(range);
-    lookup_table_->Build();
+    color_transfer_function_ = vtkSmartPointer<vtkColorTransferFunction>::New();
+    color_transfer_function_->AddRGBPoint(range[0], 0.0,0.0,1.0);
+    color_transfer_function_->AddRGBPoint(range[1], 1.0,0.0,0.0);
+    color_transfer_function_->Build();
 
-    mesh_data_mapper_->SetLookupTable(lookup_table_);
+    mesh_data_mapper_->SetLookupTable(color_transfer_function_);
     mesh_data_mapper_->SetScalarRange(range);
     mesh_data_mapper_->SetScalarVisibility(1);
 
-    scalarBar->SetLookupTable(lookup_table_);
+    scalarBar->SetLookupTable(color_transfer_function_);
     scalarBar->SetTitle("Scar");
     scalarBar->SetNumberOfLabels(10);
     scalarBar->SetOrientationToVertical();
@@ -410,20 +405,22 @@ void RendererTabWidget::ShowInterpolatedActivationTime()
     interpolator->Update();
 
 
-    lookup_table_ = vtkSmartPointer<vtkLookupTable>::New();
-    lookup_table_->SetTableRange(interpolator->GetOutput()->GetScalarRange());
-    lookup_table_->Build();
+    color_transfer_function_ = vtkSmartPointer<vtkColorTransferFunction>::New();
+    double *range = interpolator->GetOutput()->GetScalarRange();
+    color_transfer_function_->AddRGBPoint(range[0], 0.0, 0.0, 1.0);
+    color_transfer_function_->AddRGBPoint(range[1], 1.0, 0.0, 0.0);
+    color_transfer_function_->Build();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(interpolator->GetOutputPort());
     mesh_data_mapper_->SetInputConnection(interpolator->GetOutputPort());
     // particle_mapper_->SetInputConnection(interpolator->GetOutputPort());
 
-    mesh_data_mapper_->SetLookupTable(lookup_table_);
+    mesh_data_mapper_->SetLookupTable(color_transfer_function_);
     mesh_data_mapper_->SetScalarRange(interpolator->GetOutput()->GetScalarRange());
     mesh_data_mapper_->SetScalarVisibility(1);
 
-    scalarBar->SetLookupTable(lookup_table_);
+    scalarBar->SetLookupTable(color_transfer_function_);
     scalarBar->SetTitle("Activation Time");
     scalarBar->SetNumberOfLabels(10);
     scalarBar->SetOrientationToVertical();

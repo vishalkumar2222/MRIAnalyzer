@@ -148,7 +148,7 @@ private:
 
     vtkSmartPointer<vtkPolyData> point_poly_data_;
 
-    vtkSmartPointer<vtkLookupTable> lookup_table_;
+    vtkSmartPointer<vtkColorTransferFunction> color_transfer_function_;
 
     QString image_directory_;
 
